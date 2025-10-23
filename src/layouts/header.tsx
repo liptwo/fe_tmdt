@@ -1,11 +1,10 @@
-import { Bell, FacebookIcon, GlobeIcon, HelpCircleIcon, Instagram, Search, User, ShoppingCart } from "lucide-react";
+import { Bell, FacebookIcon, GlobeIcon, HelpCircleIcon, Instagram, User, ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
 import type { NavTopNavItem } from "@/types";
 import type { notifications } from "@/types";
 import { useState } from "react";
 import Logo from "@/components/icons/Logo";
-import { SearchBar } from "@/components/search-bar";
-import { Button } from "@/components/ui/button";
+import { SearchBar } from "@/layouts/search-bar";
 import { useMobile } from "@/hooks/useMobile";
 
 const navTopNavItemsLeft: NavTopNavItem[] = [
