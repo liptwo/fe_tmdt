@@ -3,6 +3,7 @@ import './App.css'
 
 import Home from './pages/home'
 import { Login } from './pages/Login'
+import { Checkout } from './pages/Checkout'
 
 function App() {
   return (
@@ -10,6 +11,8 @@ function App() {
       <Route path='/' element={<Home />} />
       <Route path='/login' element={<Login />} />
       <Route path='/register' element={<Login />} />
+      <Route path='/cart' />
+      <Route path='/checkout' element={<Checkout />} />
     </Routes>
   )
 }
