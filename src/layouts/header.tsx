@@ -54,7 +54,7 @@ const notifications: notifications[] = [
     },
 
 ]
-const Header = () => {
+const Header = ({ navbarBelow = true }) => {
     const [notificationsOpen, setNotificationsOpen] = useState(false);
     const [cartOpen, setCartOpen] = useState(false);
     const [dropdownStates, setDropdownStates] = useState<Record<string, boolean>>({});
@@ -190,103 +190,107 @@ const Header = () => {
                 </nav>
 
             </div>
-            <div className="flex items-center">
-                <Logo className="text-[#fffeff] mr-12 hidden md:block" />
-                <div className={`${isMobile ? 'flex-2' : 'flex-1'}`}>
-                    <SearchBar />
-                </div>
+            {/* Navbar below */}
+            {navbarBelow && (
+                <div className="flex items-center">
+                    <Logo className="text-[#fffeff] mr-12 hidden md:block" />
+                    <div className={`${isMobile ? 'flex-2' : 'flex-1'}`}>
+                        <SearchBar />
+                    </div>
 
-                {/* Mobile: Shopping Cart */}
-                {isMobile && (
-                    <div className="relative flex-1 flex justify-center">
-                        <div
-                            className="flex items-center justify-center text-white hover:text-header-hover transition-colors duration-200 p-3 cursor-pointer"
-                            onMouseEnter={() => setCartOpen(true)}
-                            onMouseLeave={() => setCartOpen(false)}
-                        >
-                            <ShoppingCart size={20} />
-                        </div>
-                        {cartOpen && (
+                    {/* Mobile: Shopping Cart */}
+                    {isMobile && (
+                        <div className="relative flex-1 flex justify-center">
                             <div
-                                className="absolute right-0 mt-1 w-80 bg-white text-gray-900 shadow-lg z-50 rounded-lg"
+                                className="flex items-center justify-center text-white hover:text-header-hover transition-colors duration-200 p-3 cursor-pointer"
                                 onMouseEnter={() => setCartOpen(true)}
                                 onMouseLeave={() => setCartOpen(false)}
                             >
-                                <div className="absolute -top-2 right-4 w-4 h-4 bg-white transform rotate-45 border-l border-t border-gray-200"></div>
-                                <div className="p-4">
-                                    <div className="text-center py-8">
-                                        <ShoppingCart size={48} className="mx-auto text-gray-300 mb-4" />
-                                        <p className="text-gray-500 font-medium">Chưa có sản phẩm nào</p>
-                                        <p className="text-sm text-gray-400 mt-1">Hãy thêm sản phẩm vào giỏ hàng</p>
+                                <ShoppingCart size={20} />
+                            </div>
+                            {cartOpen && (
+                                <div
+                                    className="absolute right-0 mt-1 w-80 bg-white text-gray-900 shadow-lg z-50 rounded-lg"
+                                    onMouseEnter={() => setCartOpen(true)}
+                                    onMouseLeave={() => setCartOpen(false)}
+                                >
+                                    <div className="absolute -top-2 right-4 w-4 h-4 bg-white transform rotate-45 border-l border-t border-gray-200"></div>
+                                    <div className="p-4">
+                                        <div className="text-center py-8">
+                                            <ShoppingCart size={48} className="mx-auto text-gray-300 mb-4" />
+                                            <p className="text-gray-500 font-medium">Chưa có sản phẩm nào</p>
+                                            <p className="text-sm text-gray-400 mt-1">Hãy thêm sản phẩm vào giỏ hàng</p>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        )}
-                    </div>
-                )}
-
-                {/* Mobile: User icon */}
-                {isMobile && (
-                    <div className="relative flex-1 flex justify-center">
-                        <div
-                            className="flex items-center justify-center text-white hover:text-header-hover transition-colors duration-200 cursor-pointer"
-                            onMouseEnter={() => setDropdownOpen('Kaito', true)}
-                            onMouseLeave={() => setDropdownOpen('Kaito', false)}
-                        >
-                            <User size={20} />
+                            )}
                         </div>
-                        {dropdownStates['Kaito'] && (
+                    )}
+
+                    {/* Mobile: User icon */}
+                    {isMobile && (
+                        <div className="relative flex-1 flex justify-center">
                             <div
-                                className="absolute right-0 mt-1 w-48 bg-white text-gray-900 shadow-lg z-50 rounded-lg"
+                                className="flex items-center justify-center text-white hover:text-header-hover transition-colors duration-200 cursor-pointer"
                                 onMouseEnter={() => setDropdownOpen('Kaito', true)}
                                 onMouseLeave={() => setDropdownOpen('Kaito', false)}
                             >
-                                <div className="absolute -top-2 right-4 w-4 h-4 bg-white transform rotate-45 border-l border-t border-gray-200"></div>
-                                <div className="py-1">
-                                    <Link to="/user/profile" className="block px-4 py-2 hover:bg-gray-100 rounded font-medium">Thông tin cá nhân</Link>
-                                    <Link to="/user/orders" className="block px-4 py-2 hover:bg-gray-100 rounded font-medium">Đơn hàng của tôi</Link>
-                                    <Link to="/user/favorites" className="block px-4 py-2 hover:bg-gray-100 rounded font-medium">Sản phẩm yêu thích</Link>
-                                    <Link to="/user/settings" className="block px-4 py-2 hover:bg-gray-100 rounded font-medium">Cài đặt tài khoản</Link>
-                                    <Link to="/logout" className="block px-4 py-2 hover:bg-gray-100 rounded font-medium">Đăng xuất</Link>
-                                </div>
+                                <User size={20} />
                             </div>
-                        )}
-                    </div>
-                )}
-
-                {/* Desktop: Shopping Cart */}
-                {!isMobile && (
-                    <div className="relative">
-                        <div
-                            className="flex items-center justify-center text-white hover:text-header-hover transition-colors duration-200 md:py-7 md:px-15 cursor-pointer"
-                            onMouseEnter={() => setCartOpen(true)}
-                            onMouseLeave={() => setCartOpen(false)}
-                        >
-                            <ShoppingCart size={26} />
+                            {dropdownStates['Kaito'] && (
+                                <div
+                                    className="absolute right-0 mt-1 w-48 bg-white text-gray-900 shadow-lg z-50 rounded-lg"
+                                    onMouseEnter={() => setDropdownOpen('Kaito', true)}
+                                    onMouseLeave={() => setDropdownOpen('Kaito', false)}
+                                >
+                                    <div className="absolute -top-2 right-4 w-4 h-4 bg-white transform rotate-45 border-l border-t border-gray-200"></div>
+                                    <div className="py-1">
+                                        <Link to="/user/profile" className="block px-4 py-2 hover:bg-gray-100 rounded font-medium">Thông tin cá nhân</Link>
+                                        <Link to="/user/orders" className="block px-4 py-2 hover:bg-gray-100 rounded font-medium">Đơn hàng của tôi</Link>
+                                        <Link to="/user/favorites" className="block px-4 py-2 hover:bg-gray-100 rounded font-medium">Sản phẩm yêu thích</Link>
+                                        <Link to="/user/settings" className="block px-4 py-2 hover:bg-gray-100 rounded font-medium">Cài đặt tài khoản</Link>
+                                        <Link to="/logout" className="block px-4 py-2 hover:bg-gray-100 rounded font-medium">Đăng xuất</Link>
+                                    </div>
+                                </div>
+                            )}
                         </div>
+                    )}
 
-                        {cartOpen && (
+                    {/* Desktop: Shopping Cart */}
+                    {!isMobile && (
+                        <div className="relative">
                             <div
-                                className="absolute right-1/4 -mt-5 w-80 bg-white text-gray-900 shadow-lg z-50 rounded-lg"
+                                className="flex items-center justify-center text-white hover:text-header-hover transition-colors duration-200 md:py-7 md:px-15 cursor-pointer"
                                 onMouseEnter={() => setCartOpen(true)}
                                 onMouseLeave={() => setCartOpen(false)}
                             >
-                                {/* Triangle arrow pointing up */}
-                                <div className="absolute -top-2 right-4 w-4 h-4 bg-white transform rotate-45 border-l border-t border-gray-200"></div>
+                                <ShoppingCart size={26} />
+                            </div>
 
-                                <div className="p-4">
-                                    <div className="text-center py-8">
-                                        <ShoppingCart size={48} className="mx-auto text-gray-300 mb-4" />
-                                        <p className="text-gray-500 font-medium">Chưa có sản phẩm nào</p>
-                                        <p className="text-sm text-gray-400 mt-1">Hãy thêm sản phẩm vào giỏ hàng</p>
+                            {cartOpen && (
+                                <div
+                                    className="absolute right-1/4 -mt-5 w-80 bg-white text-gray-900 shadow-lg z-50 rounded-lg"
+                                    onMouseEnter={() => setCartOpen(true)}
+                                    onMouseLeave={() => setCartOpen(false)}
+                                >
+                                    {/* Triangle arrow pointing up */}
+                                    <div className="absolute -top-2 right-4 w-4 h-4 bg-white transform rotate-45 border-l border-t border-gray-200"></div>
+
+                                    <div className="p-4">
+                                        <div className="text-center py-8">
+                                            <ShoppingCart size={48} className="mx-auto text-gray-300 mb-4" />
+                                            <p className="text-gray-500 font-medium">Chưa có sản phẩm nào</p>
+                                            <p className="text-sm text-gray-400 mt-1">Hãy thêm sản phẩm vào giỏ hàng</p>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        )}
-                    </div>
-                )}
+                            )}
+                        </div>
+                    )}
 
-            </div>
+                </div>
+
+            )}
         </div>
     )
 }

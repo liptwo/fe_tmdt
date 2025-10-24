@@ -124,7 +124,7 @@ export function Login() {
                       <div className='flex items-center'>
                         <Label htmlFor='sdt'>Số điện thoại</Label>
                       </div>
-                      <Input id='sdt' type='sdt' required />
+                      <Input id='sdt' type='sdt' placeholder='Nhập số điện thoại  ' required />
                     </div>
                     <div className='grid gap-2'>
                       <Label htmlFor='email'>Email</Label>
@@ -139,7 +139,7 @@ export function Login() {
                       <div className='flex items-center'>
                         <Label htmlFor='password'>Mật khẩu</Label>
                       </div>
-                      <Input id='password' type='password' required />
+                      <Input id='password' type='password' placeholder='Nhập mật khẩu  ' required />
                     </div>
                   </div>
                 </form>
@@ -165,7 +165,7 @@ export function Login() {
                           Quên mật khẩu?
                         </a>
                       </div>
-                      <Input id='password' type='password' required />
+                      <Input id='password' type='password' placeholder='Nhập mật khẩu  ' required />
                     </div>
                   </div>
                 </form>

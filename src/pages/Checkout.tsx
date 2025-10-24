@@ -12,6 +12,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
+import Header from '@/layouts/header'
 import { useState } from 'react'
 
 export function Checkout() {
@@ -19,22 +20,9 @@ export function Checkout() {
   return (
     <div className='w-screen h-full '>
       {/* Navbar */}
-      <div className='bg-red-500'>
-        <div className=' mx-auto max-w-7xl'>
-          <div className='flex flex-row justify-between items-center'>
-            <div className='text-xl flex gap-5  text-white'>
-              <div>Trang chủ ShopOnline</div>
-              <div>Kết nối</div>
-              <div>Facebook</div>
-              <div>Instagram</div>
-            </div>
-            <div className='flex flex-row gap-5 text-white'>
-              <div>Thông báo</div>
-              <div>Hỗ trợ</div>
-              <div>Tiếng việt</div>
-              <div>Phong Thanh</div>
-            </div>
-          </div>
+      <div className='' style={{ background: 'var(--header-background)' }}>
+        <div className='max-w-[85vw] mx-auto'>
+          <Header navbarBelow={false} />
         </div>
       </div>
       {/* Navbar below */}
