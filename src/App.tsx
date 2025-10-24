@@ -14,10 +14,10 @@ function App() {
       <Route path='/register' element={<Login />} />
       <Route path='/cart' />
       <Route path='/checkout' element={<Checkout />} />
-      <Route path='/' element={<Layout />}>
+      <!-- <Route path='/' element={<Layout />}>
         <Route index element={<Home />} />
-<!--         <Route path='hold' element={<Hold />} /> -->
-      </Route>
+         <Route path='hold' element={<Hold />} /> 
+      </Route> -->
     </Routes>
   )
 }
