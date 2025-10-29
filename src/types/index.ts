@@ -12,3 +12,10 @@ export interface notifications {
     image: string;
     link?: string;
 }
+
+
+export interface FeatBanner {
+    href: string;
+    title: string;
+    image: string;
+}
