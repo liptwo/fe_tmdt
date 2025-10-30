@@ -7,6 +7,7 @@ import { Checkout } from './pages/Checkout'
 import Layout from './layouts'
 import Home from './pages/Home'
 import User from './pages/user/User'
+import NotFound from './pages/not-found'
 
 function App() {
   return (
@@ -21,7 +22,7 @@ function App() {
       <Route path='checkout' element={<Checkout />} />
       <Route path='/login' element={<Login />} />
       <Route path='/register' element={<Login />} />
-
+      <Route path='*' element={<NotFound />} />
     </Routes>
   )
 }

@@ -19,3 +19,11 @@ export interface FeatBanner {
     title: string;
     image: string;
 }
+
+export interface TopProducts {
+    id: number;
+    title: string;
+    image: string;
+    sales: string;
+    href: string;
+}
