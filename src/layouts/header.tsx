@@ -64,7 +64,7 @@ const Header = ({ navbarBelow = true }) => {
         setDropdownStates(prev => ({ ...prev, [name]: isOpen }));
     };
     return (
-        <div className="flex flex-col justify-center py-2 px-1.5 md:py-1 md:px-4 md:10 lg:px-20 xl:px-40" style={{ background: 'var(--header-background)' }}>
+        <div className="sticky top-0 z-50 flex-col justify-center py-2 px-1.5 md:py-1 md:px-4 md:10 lg:px-20 xl:px-40">
             <div className=" justify-between text-[13px] p-1 hidden md:flex">
                 <nav className="flex items-center ">
                     <div className="flex gap-3">
