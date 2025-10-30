@@ -81,7 +81,7 @@ const Banner = () => {
 
 
     return (
-        <div className="w-full h-full flex flex-col items-center justify-center">
+        <div className="w-full h-full flex flex-col items-center justify-center  md:px-40">
             <div className='hidden md:flex justify-center items-center w-full '>
                 <Carousel
                     className="flex-2 "
