@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Bell, UserRound, ShoppingBag, Ticket } from "lucide-react";
+import { Bell, UserRound, ShoppingBag, Ticket, Wallet } from "lucide-react";
 import Profile from './Profile';
 import Address from './Address';
 import Bank from './Bank';
-
+import Update from './Update';
 
 import Privacy from './setting/Privacy';
 import PerInfo from './PerInfo';
 import DeleteAcc from './DeleteAcc';
 import Order from './Order';
+import Vouchers from './Vouchers';
+import Promotion from './Promotion';
 const User = () => {
     const navigate = useNavigate();
     const location = useLocation();
@@ -38,9 +40,9 @@ const User = () => {
             label: "Thông Báo", icon: <Bell />,
             path: "/notifications",
             children: [
-                { name: "Cập Nhật Đơn Hàng" },
-                { name: "Khuyến Mãi" },
-                { name: "Cập Nhật Ví" }
+                { name: "Cập Nhật Đơn Hàng", path: "/notifications/update" },
+                { name: "Khuyến Mãi", path: "/notifications/promotion" },
+                { name: "Cập Nhật Ví", path: "/notifications/wallet" }
             ]
         },
         {
@@ -52,7 +54,7 @@ const User = () => {
                 { name: "Địa Chỉ", path: "/account/address" },
                 { path: "/account/delete" },
                 { name: "Đổi Mật Khẩu", path: "/account/change-password" },
-                { name: "Cài Đặt Thông Báo", path: "/account/notification-settings" },
+                // { name: "Cài Đặt Thông Báo", path: "/account/notification-settings" },
                 { name: "Những Thiết Lập Riêng Tư", path: "/setting/privacy" },
                 { name: "Thông Tin Cá Nhân", path: "/account/perinfo" },
             ],
@@ -167,6 +169,11 @@ const User = () => {
                     {location.pathname.includes('delete') && <DeleteAcc />}
                     {location.pathname.includes('order') && < Order />}
                     {location.pathname.includes('bank') && < Bank />}
+                    {location.pathname.includes('vouchers') && < Vouchers />}
+                    {location.pathname.includes('update') && < Update />}
+                    {location.pathname.includes('wallet') && < Wallet />}
+                    {location.pathname.includes('promotion') && < Promotion />}
+
 
 
                 </div>
