@@ -1,20 +1,51 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Bank = () => {
     const [showCard, setShowCard] = useState(false);
-    const [step, setStep] = useState(1); // 1 = form nhập thông tin cá nhân, 2 = form ngân hàng
+    const [step, setStep] = useState(1);
+    const [banks, setBanks] = useState([]);
+    const [selectedBank, setSelectedBank] = useState("");
+    const [branch, setBranch] = useState("");
+    const [accountNumber, setAccountNumber] = useState("");
+    const [fullName, setFullName] = useState("");
+    const [bankAccounts, setBankAccounts] = useState([]); // ✅ Lưu danh sách ngân hàng đã thêm
     const navigate = useNavigate();
+
+    // Gọi API để lấy danh sách ngân hàng (logo, tên)
+    useEffect(() => {
+        if (step === 2) {
+            fetch("https://api.vietqr.io/v2/banks")
+                .then((res) => res.json())
+                .then((data) => setBanks(data.data))
+                .catch((err) => console.error("Error fetching banks:", err));
+        }
+    }, [step]);
 
     const handleSubmitStep1 = (e) => {
         e.preventDefault();
-        setStep(2); // Chuyển sang bước 2
+        setStep(2);
     };
 
     const handleSubmitStep2 = (e) => {
         e.preventDefault();
+
+        // Thêm ngân hàng vào danh sách
+        const selected = banks.find((b) => b.code === selectedBank);
+        setBankAccounts((prev) => [
+            ...prev,
+            {
+                bank: selected ? selected.name : selectedBank,
+                logo: selected ? selected.logo : "",
+                branch,
+                accountNumber,
+                fullName,
+            },
+        ]);
+
         alert("Thêm tài khoản ngân hàng thành công!");
         setShowCard(false);
+        setStep(1);
     };
 
     return (
@@ -50,63 +81,88 @@ const Bank = () => {
                     </button>
                 </div>
 
-                <div className="flex justify-center items-center py-16">
-                    <p className="text-gray-500 italic text-base">
-                        Bạn chưa liên kết tài khoản ngân hàng nào.
-                    </p>
-                </div>
+                {/* ✅ Hiển thị danh sách ngân hàng đã thêm */}
+                {bankAccounts.length > 0 ? (
+                    <div className="space-y-4">
+                        {bankAccounts.map((acc, index) => (
+                            <div
+                                key={index}
+                                className="flex items-center justify-between border rounded-lg p-4 shadow-sm"
+                            >
+                                <div className="flex items-center gap-3">
+                                    {acc.logo && (
+                                        <img
+                                            src={acc.logo}
+                                            alt={acc.bank}
+                                            className="w-10 h-10 rounded-full object-contain"
+                                        />
+                                    )}
+                                    <div>
+                                        <h3 className="font-semibold text-gray-800">{acc.bank}</h3>
+                                        <p className="text-gray-600 text-sm">
+                                            Chi nhánh: {acc.branch}
+                                        </p>
+                                        <p className="text-gray-500 text-sm">
+                                            Số TK: {acc.accountNumber}
+                                        </p>
+                                    </div>
+                                </div>
+                                <p className="text-gray-700 font-medium">{acc.fullName}</p>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="flex justify-center items-center py-16">
+                        <p className="text-gray-500 italic text-base">
+                            Bạn chưa liên kết tài khoản ngân hàng nào.
+                        </p>
+                    </div>
+                )}
             </section>
 
-            {/* ✅ Popup hiển thị đè lên màn hình */}
+            {/* Popup thêm ngân hàng */}
             {showCard && (
                 <div className="fixed inset-0 flex justify-center items-center bg-black-1/2 bg-opacity-50 z-50">
                     <div className="bg-white rounded-lg shadow-lg w-96 p-6 relative animate-fadeIn">
-                        {/* Bước 1: Thông tin cá nhân */}
+                        {/* Bước 1 */}
                         {step === 1 && (
                             <>
                                 <h3 className="font-semibold text-lg mb-4 text-gray-800">
                                     Thêm Tài Khoản Ngân Hàng
                                 </h3>
-
                                 <form className="space-y-3" onSubmit={handleSubmitStep1}>
-                                    <div>
-                                        <input
-                                            type="text"
-                                            placeholder="Tên"
-                                            className="w-full border px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-                                            required
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <input
-                                            type="text"
-                                            placeholder="Số CCCD"
-                                            className="w-full border px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-                                            required
-                                        />
-                                    </div>
-
+                                    <input
+                                        type="text"
+                                        placeholder="Tên"
+                                        className="w-full border px-3 py-2 rounded-md focus:ring-2 focus:ring-orange-500"
+                                        required
+                                    />
+                                    <input
+                                        type="text"
+                                        placeholder="Số CCCD"
+                                        className="w-full border px-3 py-2 rounded-md focus:ring-2 focus:ring-orange-500"
+                                        required
+                                    />
                                     <div className="flex justify-end gap-3 mt-4">
                                         <button
                                             type="button"
-                                            className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors"
+                                            className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400"
                                             onClick={() => setShowCard(false)}
                                         >
                                             Trở về
                                         </button>
                                         <button
                                             type="submit"
-                                            className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-md transition-colors"
+                                            className="px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-md"
                                         >
-                                            Hoàn thành
+                                            Tiếp tục
                                         </button>
                                     </div>
                                 </form>
                             </>
                         )}
 
-                        {/* Bước 2: Form ngân hàng chi tiết */}
+                        {/* Bước 2 */}
                         {step === 2 && (
                             <form onSubmit={handleSubmitStep2} className="space-y-3">
                                 <div className="flex items-center gap-2 mb-4">
@@ -121,52 +177,47 @@ const Bank = () => {
                                     </h3>
                                 </div>
 
-                                {/* Tên ngân hàng */}
                                 <select
                                     required
-                                    className="w-full border px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                    value={selectedBank}
+                                    onChange={(e) => setSelectedBank(e.target.value)}
+                                    className="w-full border px-3 py-2 rounded-md focus:ring-2 focus:ring-orange-500"
                                 >
-                                    <option value="">Tên ngân hàng</option>
-                                    <option value="vietcombank">Vietcombank</option>
-                                    <option value="techcombank">Techcombank</option>
-                                    <option value="acb">ACB</option>
+                                    <option value="">Chọn ngân hàng</option>
+                                    {banks.map((b) => (
+                                        <option key={b.code} value={b.code}>
+                                            {b.shortName || b.name}
+                                        </option>
+                                    ))}
                                 </select>
 
-                                {/* Tên chi nhánh */}
-                                <select
+                                <input
+                                    type="text"
+                                    placeholder="Tên chi nhánh"
                                     required
-                                    className="w-full border px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-                                >
-                                    <option value="">Tên chi nhánh</option>
-                                    <option value="hcm">TP. Hồ Chí Minh</option>
-                                    <option value="hanoi">Hà Nội</option>
-                                </select>
+                                    value={branch}
+                                    onChange={(e) => setBranch(e.target.value)}
+                                    className="w-full border px-3 py-2 rounded-md focus:ring-2 focus:ring-orange-500"
+                                />
 
-                                {/* Số tài khoản */}
                                 <input
                                     type="text"
                                     placeholder="Số tài khoản"
                                     required
-                                    className="w-full border px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                    value={accountNumber}
+                                    onChange={(e) => setAccountNumber(e.target.value)}
+                                    className="w-full border px-3 py-2 rounded-md focus:ring-2 focus:ring-orange-500"
                                 />
 
-                                {/* Tên đầy đủ */}
                                 <input
                                     type="text"
-                                    placeholder="Tên đầy đủ (viết in hoa, không dấu)"
+                                    placeholder="Tên đầy đủ (IN HOA, KHÔNG DẤU)"
                                     required
-                                    className="w-full border px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                                    value={fullName}
+                                    onChange={(e) => setFullName(e.target.value)}
+                                    className="w-full border px-3 py-2 rounded-md focus:ring-2 focus:ring-orange-500"
                                 />
 
-                                {/* Checkbox */}
-                                <div className="flex items-center gap-2 mt-2">
-                                    <input type="checkbox" id="default" />
-                                    <label htmlFor="default" className="text-gray-700">
-                                        Đặt làm mặc định
-                                    </label>
-                                </div>
-
-                                {/* Nút */}
                                 <div className="flex justify-between pt-4">
                                     <button
                                         type="button"
@@ -177,7 +228,7 @@ const Bank = () => {
                                     </button>
                                     <button
                                         type="submit"
-                                        className="px-5 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-md transition-colors"
+                                        className="px-5 py-2 bg-orange-600 hover:bg-orange-700 text-white rounded-md"
                                     >
                                         Hoàn Thành
                                     </button>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Bell, UserRound, ShoppingBag, Ticket, Wallet } from "lucide-react";
+import { Bell, UserRound, ShoppingBag, Ticket } from "lucide-react";
 import Profile from './Profile';
 import Address from './Address';
 import Bank from './Bank';
@@ -12,6 +12,8 @@ import DeleteAcc from './DeleteAcc';
 import Order from './Order';
 import Vouchers from './Vouchers';
 import Promotion from './Promotion';
+import Wallet from './Wallet';
+import ChangePassword from './ChangePassword';
 const User = () => {
     const navigate = useNavigate();
     const location = useLocation();
@@ -52,8 +54,8 @@ const User = () => {
                 { name: "Hồ Sơ", path: "/account/profile" },
                 { name: "Ngân Hàng", path: "/account/bank" },
                 { name: "Địa Chỉ", path: "/account/address" },
-                { path: "/account/delete" },
-                { name: "Đổi Mật Khẩu", path: "/account/change-password" },
+                // { path: "/account/delete" },
+                { name: "Đổi Mật Khẩu", path: "/account/changepassword" },
                 // { name: "Cài Đặt Thông Báo", path: "/account/notification-settings" },
                 { name: "Những Thiết Lập Riêng Tư", path: "/setting/privacy" },
                 { name: "Thông Tin Cá Nhân", path: "/account/perinfo" },
@@ -173,6 +175,8 @@ const User = () => {
                     {location.pathname.includes('update') && < Update />}
                     {location.pathname.includes('wallet') && < Wallet />}
                     {location.pathname.includes('promotion') && < Promotion />}
+                    {location.pathname.includes('changepassword') && < ChangePassword />}
+
 
 
 
