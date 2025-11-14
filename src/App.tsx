@@ -15,21 +15,23 @@ function App() {
     <div className="relative">
       <Routes>
         <Route path="/" element={<Layout />}>
-          <Route index element={<Home />} />
-          <Route path="/user" element={<User />} />
-          <Route path="/cart" />
-          <Route path="/product" element={<ProductPage />} />
-        </Route>
-
+        <Route index element={<Home />} />
+        <Route path="/user" element={<User />} />
+        <Route path="/cart" />
+        <Route path="/product" element={<ProductPage />} />
+        <Route path='/user' element={<User />} />
+        <Route path='/cart' />
+        {/* thêm các route con ở đây */}
+        <Route path='checkout' element={<Checkout />} />
+        <Route path='*' element={<NotFound />} />
         <Route path="/channel/*" element={<SellAndChatApp />} />
-        <Route path="/checkout" element={<Checkout />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Login />} />
       </Routes>
 
       <FloatingChatBox />
     </div>
-  );
+  )
 }
 
 export default App;
