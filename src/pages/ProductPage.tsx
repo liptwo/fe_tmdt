@@ -494,13 +494,24 @@ const ProductPage = () => {
     setCartStatus("loading");
     setCartMessage(null);
     try {
+      console.log("[cart] adding item", {
+        productId,
+        quantity,
+        tokenPreview: `${token.slice(0, 12)}…`,
+      });
       await cartApi.addItem(token, {
         productId,
         quantity,
       });
+      console.log("[cart] add success");
       setCartStatus("success");
       setCartMessage("Đã thêm vào giỏ hàng!");
     } catch (error) {
+      console.error("[cart] add failed", {
+        productId,
+        quantity,
+        error,
+      });
       setCartStatus("error");
       if (error instanceof ApiError) {
         setCartMessage(error.message);
