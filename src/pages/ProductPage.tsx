@@ -401,7 +401,8 @@ const ProductPage = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { token } = useAuth();
-  const productId = searchParams.get("id");
+  const rawProductId = searchParams.get("id");
+  const productId = rawProductId?.trim() || null;
   const isBackendProductId =
     !!productId &&
     /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(
