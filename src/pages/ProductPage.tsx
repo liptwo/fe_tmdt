@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ShoppingCart, MessageCircle, Store } from "lucide-react"; // ✅ thêm icon
+import { useSearchParams } from "react-router-dom";
+import { ApiError, productsApi } from "@/lib/api";
 
 interface Review {
   id: number;
@@ -24,7 +26,7 @@ interface Recommended {
   price: string;
 }
 
-const product = {
+const defaultProduct = {
   name: "Kem Dưỡng Ẩm Cấp Nước XYZ",
   price: "$499",
   image: "https://via.placeholder.com/400",
@@ -174,6 +176,9 @@ const product = {
   ] as Recommended[],
 };
 
+const formatCurrency = (value: number) =>
+  new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(Number(value));
+
 const computeReviewSummary = (reviews: DetailedReview[]) => {
   const ratingsCount: Record<number, number> = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 };
   let totalComments = 0;
@@ -190,8 +195,6 @@ const computeReviewSummary = (reviews: DetailedReview[]) => {
 
   return { ratingsCount, totalComments, totalMedia, averageRating };
 };
-
-const reviewSummary = computeReviewSummary(product.reviews);
 
 const ReviewItem = ({ review }: { review: DetailedReview }) => {
   const renderStars = (rating: number) => (
@@ -277,6 +280,8 @@ const ReviewSummary = ({ reviews }: { reviews: DetailedReview[] }) => {
       return true;
     });
   
+  const reviewSummary = useMemo(() => computeReviewSummary(reviews), [reviews]);
+
   // Áp dụng giới hạn 5 review đầu tiên
   const reviewsToDisplay = showAllReviews 
     ? filteredReviews 
@@ -324,7 +329,7 @@ const ReviewSummary = ({ reviews }: { reviews: DetailedReview[] }) => {
           >
             Tất Cả
           </button>
-          {Object.entries(reviewSummary.ratingsCount)
+          {Object.entries(reviewSummary.ratingsCount as Record<string, number>)
             .reverse()
             .map(([star, count]) => (
               <button
@@ -335,7 +340,7 @@ const ReviewSummary = ({ reviews }: { reviews: DetailedReview[] }) => {
                   setShowAllReviews(false); // Reset trạng thái xem thêm khi đổi tab
                 }}
               >
-                {star} Sao ({formatCount(count)})
+                {star} Sao ({formatCount(Number(count))})
               </button>
             ))}
         </div>
@@ -389,16 +394,70 @@ const ReviewSummary = ({ reviews }: { reviews: DetailedReview[] }) => {
 
 // ---------------------- MAIN ------------------------
 const ProductPage = () => {
-  const [selectedProduct, setSelectedProduct] = useState<Recommended | null>(
-    null
+  const [searchParams] = useSearchParams();
+  const productId = searchParams.get("id");
+  const isBackendProductId = Boolean(
+    productId &&
+      /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(
+        productId
+      )
   );
+  const [productOverride, setProductOverride] = useState<Partial<typeof defaultProduct>>({});
+  const [isLoadingProduct, setIsLoadingProduct] = useState(false);
+  const [productError, setProductError] = useState<string | null>(null);
+  const product = useMemo(() => ({ ...defaultProduct, ...productOverride }), [productOverride]);
+
+  const [selectedProduct, setSelectedProduct] = useState<Recommended | null>(null);
   const [quantity, setQuantity] = useState(1);
+
+  useEffect(() => {
+    let isMounted = true;
+    if (!isBackendProductId) {
+      setProductError(
+        productId
+          ? "Sản phẩm demo đang được hiển thị tạm thời."
+          : null
+      );
+      setIsLoadingProduct(false);
+      return () => {
+        isMounted = false;
+      };
+    }
+
+    const fetchProduct = async () => {
+      setIsLoadingProduct(true);
+      setProductError(null);
+      try {
+        const data = await productsApi.getById(productId!);
+        if (!isMounted) return;
+        setProductOverride({
+          name: data.name,
+          price: formatCurrency(Number(data.price)),
+          image: data.images?.[0] ?? defaultProduct.image,
+          description: data.description ?? defaultProduct.description,
+        });
+      } catch (err) {
+        if (!isMounted) return;
+        const message = err instanceof ApiError ? err.message : "Không thể tải thông tin sản phẩm.";
+        setProductError(message);
+      } finally {
+        if (isMounted) {
+          setIsLoadingProduct(false);
+        }
+      }
+    };
+
+    fetchProduct();
+    return () => {
+      isMounted = false;
+    };
+  }, [productId, isBackendProductId]);
   
   // LOGIC CHO PHẦN GỢI Ý SẢN PHẨM (GIỮ NGUYÊN)
   const [showAllRecommended, setShowAllRecommended] = useState(false);
   const maxProductsToShow = 18;
-  const recommendedProductsToShow = showAllRecommended 
-    ? product.recommended 
+  const recommendedProductsToShow = showAllRecommended
+    ? product.recommended
     : product.recommended.slice(0, maxProductsToShow);
   
   const handleToggleShowRecommended = () => {
@@ -412,6 +471,16 @@ const ProductPage = () => {
 
   return (
     <div className="bg-white-50 min-h-screen text-black p-8">
+      {productError && (
+        <div className="mb-4 rounded-md border border-red-200 bg-red-50 px-4 py-2 text-sm text-red-600">
+          {productError}
+        </div>
+      )}
+      {isLoadingProduct && (
+        <div className="mb-4 rounded-md border border-blue-200 bg-blue-50 px-4 py-2 text-sm text-blue-600">
+          Đang tải thông tin sản phẩm...
+        </div>
+      )}
       {/* Sản phẩm chính */}
       <div className="flex flex-col md:flex-row gap-8 bg-white p-8 rounded-2xl shadow-lg border-t-4 border-green-500 hover:shadow-xl transition-all duration-300">
         <img

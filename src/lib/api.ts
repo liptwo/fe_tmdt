@@ -46,6 +46,19 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   return data as T
 }
 
+type QueryParamValue = string | number | boolean | undefined | null
+
+const buildQueryString = (params?: Record<string, QueryParamValue>) => {
+  if (!params) return ''
+  const searchParams = new URLSearchParams()
+  Object.entries(params).forEach(([key, value]) => {
+    if (value === undefined || value === null || value === '') return
+    searchParams.append(key, String(value))
+  })
+  const query = searchParams.toString()
+  return query ? `?${query}` : ''
+}
+
 export interface UserInfo {
   id: string
   email: string
@@ -73,6 +86,56 @@ export interface LoginResponse {
 
 export type RegisterResponse = UserInfo
 
+export interface Category {
+  id: string
+  name: string
+  description?: string
+  status: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface ProductsQuery extends Record<string, QueryParamValue> {
+  search?: string
+  categoryId?: string
+  minPrice?: number
+  maxPrice?: number
+  page?: number
+  limit?: number
+  sortBy?: string
+  sortOrder?: 'ASC' | 'DESC'
+}
+
+export interface Product {
+  id: string
+  name: string
+  description?: string | null
+  price: number
+  stock: number
+  images: string[]
+  status: string
+  categoryId: string
+  sellerId: string
+  category?: Category
+  seller?: {
+    id: string
+    email: string
+    fullName: string
+  }
+  createdAt: string
+  updatedAt: string
+}
+
+export interface ProductListResponse {
+  products: Product[]
+  pagination: {
+    page: number
+    limit: number
+    total: number
+    totalPages: number
+  }
+}
+
 export const authApi = {
   login: (payload: LoginPayload) =>
     request<LoginResponse>('/auth/login', {
@@ -90,6 +153,16 @@ export const authApi = {
         Authorization: `Bearer ${token}`
       }
     })
+}
+
+export const categoriesApi = {
+  list: () => request<Category[]>('/categories')
+}
+
+export const productsApi = {
+  list: (params?: ProductsQuery) =>
+    request<ProductListResponse>(`/products${buildQueryString(params)}`),
+  getById: (id: string) => request<Product>(`/products/${id}`)
 }
 
 export { ApiError }

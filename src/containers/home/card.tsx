@@ -1,28 +1,35 @@
 import { Link } from "react-router-dom"
 import { Tag } from "@/components/tag/tag"
 
-type TagType = "cheap" | "commission" | "flash"
+export type TagType = "cheap" | "commission" | "flash"
 
-interface CardProps {
-    id: number
+export interface CardProps {
+    id: number | string
     title: string
-    image: string
-    originalPrice: number
+    image?: string
+    originalPrice?: number | null
     price: number
-    discount: number
-    sold: number
-    rating?: number
+    discount?: number | null
+    sold?: number | null
+    rating?: number | null
     href: string
     tags?: TagType[]
 }
 
+const formatCurrency = (value: number) =>
+    new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(Number(value))
+
 const Card = ({ title, image, originalPrice, price, discount, sold, rating, href, tags }: CardProps) => {
+    const hasDiscount = typeof discount === "number" && discount > 0
+    const hasOriginalPrice = typeof originalPrice === "number" && originalPrice > Number(price)
+    const formattedPrice = formatCurrency(price ?? 0)
+
     return (
         <Link to={href} className="block bg-white hover:shadow-lg hover:-translate-y-1 transition-all duration-200 border border-[#00000017] overflow-hidden">
             {/* Image */}
             <div className="relative aspect-square bg-[#f5f5f5]">
-                <img src={image} alt={title} className="w-full h-full object-cover" />
-                {discount > 0 && (
+                <img src={image ?? "/placeholder.svg"} alt={title} className="w-full h-full object-cover" />
+                {hasDiscount && (
                     <div className="absolute top-0 right-0 bg-[#fdeeea] text-[#ee4d2d] text-xs  px-1 py-0.5">
                         -{discount}%
                     </div>
@@ -48,13 +55,13 @@ const Card = ({ title, image, originalPrice, price, discount, sold, rating, href
 
                 {/* Price */}
                 <div className="flex items-center gap-2 mb-1">
-                    {originalPrice && originalPrice > price && (
+                    {hasOriginalPrice && (
                         <span className="text-xs text-[#757575] line-through">
-                            ₫{originalPrice.toLocaleString()}
+                            {formatCurrency(originalPrice as number)}
                         </span>
                     )}
                     <span className="text-base text-[#ee4d2d] font-medium">
-                        ₫{price.toLocaleString()}
+                        {formattedPrice}
                     </span>
                 </div>
 
@@ -66,7 +73,9 @@ const Card = ({ title, image, originalPrice, price, discount, sold, rating, href
                             <span>{rating.toFixed(1)}</span>
                         </div>
                     )}
-                    <span>Đã bán {sold >= 1000 ? `${(sold / 1000).toFixed(1)}k` : sold}</span>
+                    {typeof sold === "number" && (
+                        <span>Đã bán {sold >= 1000 ? `${(sold / 1000).toFixed(1)}k` : sold}</span>
+                    )}
                 </div>
 
 
