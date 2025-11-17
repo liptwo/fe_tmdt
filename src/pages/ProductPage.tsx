@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import { ShoppingCart, MessageCircle, Store } from "lucide-react"; // ✅ thêm icon
-import { useSearchParams } from "react-router-dom";
-import { ApiError, productsApi } from "@/lib/api";
+import { ShoppingCart, MessageCircle, Store } from "lucide-react"; // 
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { ApiError, cartApi, productsApi } from "@/lib/api";
+import { useAuth } from "@/context/auth-context";
 
 interface Review {
   id: number;
@@ -395,13 +396,14 @@ const ReviewSummary = ({ reviews }: { reviews: DetailedReview[] }) => {
 // ---------------------- MAIN ------------------------
 const ProductPage = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { token } = useAuth();
   const productId = searchParams.get("id");
-  const isBackendProductId = Boolean(
-    productId &&
-      /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(
-        productId
-      )
-  );
+  const isBackendProductId =
+    !!productId &&
+    /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(
+      productId
+    );
   const [productOverride, setProductOverride] = useState<Partial<typeof defaultProduct>>({});
   const [isLoadingProduct, setIsLoadingProduct] = useState(false);
   const [productError, setProductError] = useState<string | null>(null);
@@ -409,6 +411,8 @@ const ProductPage = () => {
 
   const [selectedProduct, setSelectedProduct] = useState<Recommended | null>(null);
   const [quantity, setQuantity] = useState(1);
+  const [cartMessage, setCartMessage] = useState<string | null>(null);
+  const [cartStatus, setCartStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
 
   useEffect(() => {
     let isMounted = true;
@@ -468,6 +472,39 @@ const ProductPage = () => {
 
   const increase = () => setQuantity(quantity + 1);
   const decrease = () => setQuantity(quantity > 1 ? quantity - 1 : 1);
+
+  const handleAddToCart = async () => {
+    if (!isBackendProductId || !productId) {
+      setCartMessage("Sản phẩm demo này chưa hỗ trợ thêm vào giỏ.");
+      setCartStatus("error");
+      return;
+    }
+
+    if (!token) {
+      setCartMessage("Vui lòng đăng nhập để thêm sản phẩm vào giỏ.");
+      setCartStatus("error");
+      navigate("/login");
+      return;
+    }
+
+    setCartStatus("loading");
+    setCartMessage(null);
+    try {
+      await cartApi.addItem(token, {
+        productId,
+        quantity,
+      });
+      setCartStatus("success");
+      setCartMessage("Đã thêm vào giỏ hàng!");
+    } catch (error) {
+      setCartStatus("error");
+      if (error instanceof ApiError) {
+        setCartMessage(error.message);
+      } else {
+        setCartMessage("Không thể thêm vào giỏ hàng. Vui lòng thử lại.");
+      }
+    }
+  };
 
   return (
     <div className="bg-white-50 min-h-screen text-black p-8">
@@ -530,13 +567,29 @@ const ProductPage = () => {
               </div>
             </div>
 
-            <div className="flex gap-3">
-              <button className="border border-orange-500 text-orange-600 px-6 py-2 rounded-md hover:bg-orange-50 transition-all flex items-center gap-2">
-                <ShoppingCart className="w-4 h-4" /> Thêm vào giỏ
-              </button>
-              <button className="bg-orange-500 text-white px-6 py-2 rounded-md hover:bg-orange-600 transition-all">
-                Mua ngay
-              </button>
+            <div className="flex flex-col gap-3">
+              <div className="flex gap-3">
+                <button
+                  onClick={handleAddToCart}
+                  disabled={cartStatus === "loading"}
+                  className="border border-orange-500 text-orange-600 px-6 py-2 rounded-md hover:bg-orange-50 transition-all flex items-center gap-2 disabled:opacity-60"
+                >
+                  <ShoppingCart className="w-4 h-4" />
+                  {cartStatus === "loading" ? "Đang thêm..." : "Thêm vào giỏ"}
+                </button>
+                <button className="bg-orange-500 text-white px-6 py-2 rounded-md hover:bg-orange-600 transition-all">
+                  Mua ngay
+                </button>
+              </div>
+              {cartMessage && (
+                <p
+                  className={`text-sm ${
+                    cartStatus === "success" ? "text-green-600" : "text-red-600"
+                  }`}
+                >
+                  {cartMessage}
+                </p>
+              )}
             </div>
           </div>
         </div>

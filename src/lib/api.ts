@@ -136,6 +136,27 @@ export interface ProductListResponse {
   }
 }
 
+export interface AddCartItemPayload {
+  productId: string
+  quantity: number
+}
+
+export interface CartItem {
+  id: string
+  productId: string
+  quantity: number
+  unitPrice: string
+  product?: Product
+}
+
+export interface CartResponse {
+  id: string
+  userId: string
+  items: CartItem[]
+  createdAt: string
+  updatedAt: string
+}
+
 export const authApi = {
   login: (payload: LoginPayload) =>
     request<LoginResponse>('/auth/login', {
@@ -163,6 +184,17 @@ export const productsApi = {
   list: (params?: ProductsQuery) =>
     request<ProductListResponse>(`/products${buildQueryString(params)}`),
   getById: (id: string) => request<Product>(`/products/${id}`)
+}
+
+export const cartApi = {
+  addItem: (token: string, payload: AddCartItemPayload) =>
+    request<CartResponse>('/cart/items', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
 }
 
 export { ApiError }
