@@ -491,8 +491,8 @@ const ProductPage = () => {
       return;
     }
 
-    // Decode JWT to check expiration
-    let tokenInfo: { exp?: number; email?: string; role?: string } = {};
+    // Decode JWT to check expiration and get user info
+    let tokenInfo: { exp?: number; email?: string; role?: string; sub?: string } = {};
     try {
       const payload = token.split('.')[1];
       if (payload) {
@@ -519,7 +519,24 @@ const ProductPage = () => {
         tokenPreview: `${token.slice(0, 20)}…`,
         tokenExp: tokenInfo.exp ? new Date(tokenInfo.exp * 1000).toISOString() : 'unknown',
         tokenEmail: tokenInfo.email,
+        userId: tokenInfo.sub,
+        tokenRole: tokenInfo.role,
       });
+      
+      // Test cart access first to verify token works
+      try {
+        const existingCart = await cartApi.getCart(token);
+        console.log("[cart] getCart success", { cartId: existingCart.id, itemCount: existingCart.items?.length || 0 });
+      } catch (cartError) {
+        console.error("[cart] getCart failed - token may be invalid", cartError);
+        if (cartError instanceof ApiError && cartError.status === 401) {
+          setCartMessage("Phiên đăng nhập không hợp lệ. Vui lòng đăng nhập lại.");
+          setCartStatus("error");
+          setTimeout(() => navigate("/login"), 2000);
+          return;
+        }
+      }
+      
       await cartApi.addItem(token, {
         productId,
         quantity,

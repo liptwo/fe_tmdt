@@ -195,6 +195,12 @@ export const productsApi = {
 }
 
 export const cartApi = {
+  getCart: (token: string) =>
+    request<CartResponse>('/cart', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }),
   addItem: (token: string, payload: AddCartItemPayload) =>
     request<CartResponse>('/cart/items', {
       method: 'POST',
