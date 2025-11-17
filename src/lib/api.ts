@@ -37,6 +37,14 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   }
 
   if (!response.ok) {
+    // Log full error details for debugging
+    console.error('[api] request failed', {
+      url,
+      status: response.status,
+      statusText: response.statusText,
+      responseBody: text,
+      parsedData: data
+    })
     const message =
       (Array.isArray(data?.message) ? data.message[0] : data?.message) ??
       'Đã có lỗi xảy ra. Vui lòng thử lại.'
