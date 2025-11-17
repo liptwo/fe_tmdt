@@ -27,10 +27,13 @@ interface Recommended {
   price: string;
 }
 
+const placeholderImage = (size: number, label?: string) =>
+  `https://placehold.co/${size}x${size}${label ? `?text=${encodeURIComponent(label)}` : ""}`;
+
 const defaultProduct = {
   name: "Kem Dưỡng Ẩm Cấp Nước XYZ",
   price: "$499",
-  image: "https://via.placeholder.com/400",
+  image: placeholderImage(400, "Product"),
   description: `Kem dưỡng ẩm cao cấp với công thức tiên tiến:
 - Cấp nước tức thì
 - Làm dịu da nhạy cảm
@@ -128,50 +131,50 @@ const defaultProduct = {
     {
       id: 1,
       name: "Sữa Rửa Mặt A",
-      image: "https://via.placeholder.com/150",
+      image: placeholderImage(150, "SP 1"),
       price: "$399",
     },
     {
       id: 2,
       name: "Toner B",
-      image: "https://via.placeholder.com/150",
+      image: placeholderImage(150, "SP 2"),
       price: "$599",
     },
     {
       id: 3,
       name: "Serum C",
-      image: "https://via.placeholder.com/150",
+      image: placeholderImage(150, "SP 3"),
       price: "$699",
     },
     {
       id: 4,
       name: "Mặt Nạ D",
-      image: "https://via.placeholder.com/150",
+      image: placeholderImage(150, "SP 4"),
       price: "$799",
     },
     {
       id: 5,
       name: "Kem Chống Nắng E",
-      image: "https://via.placeholder.com/150",
+      image: placeholderImage(150, "SP 5"),
       price: "$899",
     },
     {
       id: 6,
       name: "Toner F",
-      image: "https://via.placeholder.com/150",
+      image: placeholderImage(150, "SP 6"),
       price: "$499",
     },
     // Thêm các sản phẩm ảo để đảm bảo có > 18 sản phẩm cho tính năng Xem thêm
     ...Array(15).fill(0).map((_, index) => ({
       id: index + 7,
       name: `Sản phẩm Gợi ý ${index + 7}`,
-      image: `https://via.placeholder.com/150?text=SP+${index + 7}`,
+      image: placeholderImage(150, `SP ${index + 7}`),
       price: `$${(Math.random() * 500 + 100).toFixed(0)}`,
     })),
     { // Tổng cộng 6 + 15 + 1 = 22 sản phẩm
       id: 22,
       name: "Sản phẩm Gợi ý Z (ngoài 18)",
-      image: "https://via.placeholder.com/150?text=SP+Z",
+      image: placeholderImage(150, "SP Z"),
       price: "$199",
     }
   ] as Recommended[],
@@ -209,7 +212,7 @@ const ReviewItem = ({ review }: { review: DetailedReview }) => {
     <div className="p-4 bg-white rounded-lg shadow-sm flex flex-col space-y-2 border border-black-200">
       <div className="flex items-start space-x-3">
         <img
-          src="https://via.placeholder.com/40"
+          src={placeholderImage(40, review.user.slice(0, 2))}
           alt={review.user}
           className="w-10 h-10 rounded-full object-cover border border-orange-300"
         />
@@ -238,7 +241,7 @@ const ReviewItem = ({ review }: { review: DetailedReview }) => {
         <div className="flex space-x-2 mt-2">
           <div className="relative w-24 h-24 border border-orange-300 rounded overflow-hidden">
             <img
-              src="https://via.placeholder.com/100?text=Video"
+              src={placeholderImage(100, "Video")}
               alt="review video"
               className="w-full h-full object-cover"
             />
@@ -248,7 +251,7 @@ const ReviewItem = ({ review }: { review: DetailedReview }) => {
           </div>
           <div className="relative w-24 h-24 border border-orange-300 rounded overflow-hidden">
             <img
-              src="https://via.placeholder.com/100?text=Image"
+              src={placeholderImage(100, "Image")}
               alt="review media 2"
               className="w-full h-full object-cover"
             />
@@ -599,7 +602,7 @@ const ProductPage = () => {
       <div className="mt-8 flex flex-col md:flex-row items-center justify-between bg-white p-6 rounded-2xl shadow-md border-t-4 border-green-500 hover:shadow-lg transition-all duration-300">
         <div className="flex items-center gap-4">
           <img
-            src="https://via.placeholder.com/80"
+            src={placeholderImage(80, "Shop")}
             alt="Shop avatar"
             className="w-16 h-16 rounded-full border border-orange-300"
           />
