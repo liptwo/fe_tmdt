@@ -83,6 +83,12 @@ export const authApi = {
     request<RegisterResponse>('/auth/register', {
       method: 'POST',
       body: JSON.stringify(payload)
+    }),
+  getProfile: (token: string) =>
+    request<UserInfo>('/auth/profile', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
     })
 }
 

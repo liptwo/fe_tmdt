@@ -16,10 +16,12 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import { ApiError, authApi } from '@/lib/api'
+import { useAuth } from '@/context/auth-context'
 export function Login() {
   const location = useLocation()
   const isRegister = location.pathname === '/register'
   const navigate = useNavigate()
+  const { setSession } = useAuth()
 
   const [fullName, setFullName] = useState('')
   const [phone, setPhone] = useState('')
@@ -105,8 +107,7 @@ export function Login() {
         email: email.trim(),
         password
       })
-      localStorage.setItem('access_token', response.access_token)
-      localStorage.setItem('user', JSON.stringify(response.user))
+      setSession(response.access_token, response.user)
       navigate('/', { replace: true })
     } catch (err) {
       if (err instanceof ApiError) {

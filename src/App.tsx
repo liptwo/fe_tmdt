@@ -3,10 +3,10 @@ import './App.css'
 import { Login } from './pages/Login'
 import { Checkout } from './pages/Checkout'
 import Layout from './layouts'
-import LayoutChat from './layouts/LayoutChat'
 import Home from './pages/Home'
 import ProductPage from './pages/ProductPage'
 import User from './pages/user/User'
+import UserProfile from './pages/user/Profile'
 import SellAndChatApp from './pages/user/Sell'
 import FloatingChatBox from './components/ui/FloatingChatBox'
 import NotFound from './pages/not-found'
@@ -18,6 +18,7 @@ function App() {
         <Route path='/' element={<Layout />}>
           <Route index element={<Home />} />
           <Route path='/user' element={<User />} />
+          <Route path='/user/profile' element={<UserProfile />} />
           <Route path='/cart' />
           <Route path='/product' element={<ProductPage />} />
           <Route path='/user' element={<User />} />

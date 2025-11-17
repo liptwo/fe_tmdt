@@ -1,11 +1,12 @@
 import { Bell, FacebookIcon, GlobeIcon, HelpCircleIcon, Instagram, User, ShoppingCart } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import type { NavTopNavItem } from "@/types";
 import type { notifications } from "@/types";
 import { useState } from "react";
 import Logo from "@/components/icons/Logo";
 import { SearchBar } from "@/layouts/search-bar";
 import { useMobile } from "@/hooks/useMobile";
+import { useAuth } from "@/context/auth-context";
 
 const navTopNavItemsLeft: NavTopNavItem[] = [
 
@@ -59,9 +60,18 @@ const Header = ({ navbarBelow = true }) => {
     const [cartOpen, setCartOpen] = useState(false);
     const [dropdownStates, setDropdownStates] = useState<Record<string, boolean>>({});
     const isMobile = useMobile();
+    const { user, logout } = useAuth();
+    const navigate = useNavigate();
 
     const setDropdownOpen = (name: string, isOpen: boolean) => {
         setDropdownStates(prev => ({ ...prev, [name]: isOpen }));
+    };
+
+    const userDisplayName = user?.fullName || user?.email || 'Đăng nhập';
+
+    const handleLogout = () => {
+        logout();
+        navigate('/login');
     };
     return (
         <div className="sticky top-0 z-50 flex-col justify-center py-2 px-1.5 md:py-1 md:px-4 md:10 lg:px-20 xl:px-40" style={{ background: 'var(--header-background)' }}>
@@ -153,7 +163,7 @@ const Header = ({ navbarBelow = true }) => {
                                     onMouseEnter={() => setDropdownOpen(item.name, true)}
                                     onMouseLeave={() => setDropdownOpen(item.name, false)}
                                 >
-                                    {item.icon ?? ''}{item.name}
+                                    {item.icon ?? ''}{item.name === 'Kaito' ? userDisplayName : item.name}
                                 </div>
 
                                 {dropdownStates[item.name] && (
@@ -172,13 +182,26 @@ const Header = ({ navbarBelow = true }) => {
                                                     <div className="block px-4 py-2 hover:bg-gray-100 rounded cursor-pointer font-medium">中文</div>
                                                 </>
                                             ) : item.name === 'Kaito' ? (
-                                                <>
-                                                    <Link to="/user/profile" className="block px-4 py-2 hover:bg-gray-100 rounded font-medium">Thông tin cá nhân</Link>
-                                                    <Link to="/user/orders" className="block px-4 py-2 hover:bg-gray-100 rounded font-medium">Đơn hàng của tôi</Link>
-                                                    <Link to="/user/favorites" className="block px-4 py-2 hover:bg-gray-100 rounded font-medium">Sản phẩm yêu thích</Link>
-                                                    <Link to="/user/settings" className="block px-4 py-2 hover:bg-gray-100 rounded font-medium">Cài đặt tài khoản</Link>
-                                                    <Link to="/logout" className="block px-4 py-2 hover:bg-gray-100 rounded font-medium">Đăng xuất</Link>
-                                                </>
+                                                user ? (
+                                                    <>
+                                                        <Link to="/user/profile" className="block px-4 py-2 hover:bg-gray-100 rounded font-medium">Thông tin cá nhân</Link>
+                                                        <Link to="/user/orders" className="block px-4 py-2 hover:bg-gray-100 rounded font-medium">Đơn hàng của tôi</Link>
+                                                        <Link to="/user/favorites" className="block px-4 py-2 hover:bg-gray-100 rounded font-medium">Sản phẩm yêu thích</Link>
+                                                        <Link to="/user/settings" className="block px-4 py-2 hover:bg-gray-100 rounded font-medium">Cài đặt tài khoản</Link>
+                                                        <button
+                                                            type="button"
+                                                            onClick={handleLogout}
+                                                            className="block w-full text-left px-4 py-2 hover:bg-gray-100 rounded font-medium"
+                                                        >
+                                                            Đăng xuất
+                                                        </button>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Link to="/login" className="block px-4 py-2 hover:bg-gray-100 rounded font-medium">Đăng nhập</Link>
+                                                        <Link to="/register" className="block px-4 py-2 hover:bg-gray-100 rounded font-medium">Đăng ký</Link>
+                                                    </>
+                                                )
                                             ) : null}
                                         </div>
                                     </div>
@@ -245,11 +268,26 @@ const Header = ({ navbarBelow = true }) => {
                                 >
                                     <div className="absolute -top-2 right-4 w-4 h-4 bg-white transform rotate-45 border-l border-t border-gray-200"></div>
                                     <div className="py-1">
-                                        <Link to="/user/profile" className="block px-4 py-2 hover:bg-gray-100 rounded font-medium">Thông tin cá nhân</Link>
-                                        <Link to="/user/orders" className="block px-4 py-2 hover:bg-gray-100 rounded font-medium">Đơn hàng của tôi</Link>
-                                        <Link to="/user/favorites" className="block px-4 py-2 hover:bg-gray-100 rounded font-medium">Sản phẩm yêu thích</Link>
-                                        <Link to="/user/settings" className="block px-4 py-2 hover:bg-gray-100 rounded font-medium">Cài đặt tài khoản</Link>
-                                        <Link to="/logout" className="block px-4 py-2 hover:bg-gray-100 rounded font-medium">Đăng xuất</Link>
+                                        {user ? (
+                                            <>
+                                                <Link to="/user/profile" className="block px-4 py-2 hover:bg-gray-100 rounded font-medium">Thông tin cá nhân</Link>
+                                                <Link to="/user/orders" className="block px-4 py-2 hover:bg-gray-100 rounded font-medium">Đơn hàng của tôi</Link>
+                                                <Link to="/user/favorites" className="block px-4 py-2 hover:bg-gray-100 rounded font-medium">Sản phẩm yêu thích</Link>
+                                                <Link to="/user/settings" className="block px-4 py-2 hover:bg-gray-100 rounded font-medium">Cài đặt tài khoản</Link>
+                                                <button
+                                                    type="button"
+                                                    onClick={handleLogout}
+                                                    className="block w-full text-left px-4 py-2 hover:bg-gray-100 rounded font-medium"
+                                                >
+                                                    Đăng xuất
+                                                </button>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Link to="/login" className="block px-4 py-2 hover:bg-gray-100 rounded font-medium">Đăng nhập</Link>
+                                                <Link to="/register" className="block px-4 py-2 hover:bg-gray-100 rounded font-medium">Đăng ký</Link>
+                                            </>
+                                        )}
                                     </div>
                                 </div>
                             )}
