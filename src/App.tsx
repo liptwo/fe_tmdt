@@ -5,6 +5,7 @@ import { Checkout } from './pages/Checkout'
 import Layout from './layouts'
 import Home from './pages/Home'
 import ProductPage from './pages/ProductPage'
+import Cart from './pages/Cart'
 import User from './pages/user/User'
 import UserProfile from './pages/user/Profile'
 import SellAndChatApp from './pages/user/Sell'
@@ -19,14 +20,11 @@ function App() {
           <Route index element={<Home />} />
           <Route path='/user' element={<User />} />
           <Route path='/user/profile' element={<UserProfile />} />
-          <Route path='/cart' />
+          <Route path='/cart' element={<Cart />} />
           <Route path='/product' element={<ProductPage />} />
-          <Route path='/user' element={<User />} />
-          <Route path='/cart' />
-          {/* thêm các route con ở đây */}
           <Route path='checkout' element={<Checkout />} />
-          <Route path='*' element={<NotFound />} />
           <Route path='/channel/*' element={<SellAndChatApp />} />
+          <Route path='*' element={<NotFound />} />
         </Route>
         <Route path='/login' element={<Login />} />
         <Route path='/register' element={<Login />} />

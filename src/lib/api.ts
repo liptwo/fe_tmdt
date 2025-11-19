@@ -19,11 +19,11 @@ class ApiError extends Error {
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   const url = `${API_BASE_URL}${path.startsWith('/') ? path : `/${path}`}`
   const response = await fetch(url, {
+    ...init,
     headers: {
       'Content-Type': 'application/json',
       ...(init.headers ?? {})
-    },
-    ...init
+    }
   })
 
   const text = await response.text()
@@ -194,6 +194,10 @@ export const productsApi = {
   getById: (id: string) => request<Product>(`/products/${id}`)
 }
 
+export interface UpdateCartItemPayload {
+  quantity: number
+}
+
 export const cartApi = {
   getCart: (token: string) =>
     request<CartResponse>('/cart', {
@@ -215,7 +219,29 @@ export const cartApi = {
         Authorization: `Bearer ${token}`
       }
     })
-  }
+  },
+  updateItem: (token: string, itemId: string, payload: UpdateCartItemPayload) =>
+    request<CartResponse>(`/cart/items/${itemId}`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }),
+  removeItem: (token: string, itemId: string) =>
+    request<CartResponse>(`/cart/items/${itemId}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }),
+  clearCart: (token: string) =>
+    request<CartResponse>('/cart/clear', {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
 }
 
 export { ApiError }

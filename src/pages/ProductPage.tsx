@@ -3,6 +3,7 @@ import { ShoppingCart, MessageCircle, Store } from "lucide-react"; //
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ApiError, cartApi, productsApi } from "@/lib/api";
 import { useAuth } from "@/context/auth-context";
+import { useCart } from "@/context/cart-context";
 
 interface Review {
   id: number;
@@ -401,6 +402,7 @@ const ProductPage = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { token } = useAuth();
+  const { refreshCart } = useCart();
   const rawProductId = searchParams.get("id");
   const productId = rawProductId?.trim() || null;
   const isBackendProductId =
@@ -545,6 +547,10 @@ const ProductPage = () => {
         quantity,
       });
       console.log("[cart] add success");
+      
+      // Refresh cart to update header
+      await refreshCart();
+      
       setCartStatus("success");
       setCartMessage("Đã thêm vào giỏ hàng!");
     } catch (error) {

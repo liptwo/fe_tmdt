@@ -7,6 +7,7 @@ import Logo from "@/components/icons/Logo";
 import { SearchBar } from "@/layouts/search-bar";
 import { useMobile } from "@/hooks/useMobile";
 import { useAuth } from "@/context/auth-context";
+import { useCart } from "@/context/cart-context";
 
 const navTopNavItemsLeft: NavTopNavItem[] = [
 
@@ -61,6 +62,7 @@ const Header = ({ navbarBelow = true }) => {
     const [dropdownStates, setDropdownStates] = useState<Record<string, boolean>>({});
     const isMobile = useMobile();
     const { user, logout } = useAuth();
+    const { cart, itemCount } = useCart();
     const navigate = useNavigate();
 
     const setDropdownOpen = (name: string, isOpen: boolean) => {
@@ -225,11 +227,16 @@ const Header = ({ navbarBelow = true }) => {
                     {isMobile && (
                         <div className="relative flex-1 flex justify-center">
                             <div
-                                className="flex items-center justify-center text-white hover:text-header-hover transition-colors duration-200 p-3 cursor-pointer"
+                                className="flex items-center justify-center text-white hover:text-header-hover transition-colors duration-200 p-3 cursor-pointer relative"
                                 onMouseEnter={() => setCartOpen(true)}
                                 onMouseLeave={() => setCartOpen(false)}
                             >
                                 <ShoppingCart size={20} />
+                                {itemCount > 0 && (
+                                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-semibold">
+                                        {itemCount}
+                                    </span>
+                                )}
                             </div>
                             {cartOpen && (
                                 <div
@@ -239,11 +246,43 @@ const Header = ({ navbarBelow = true }) => {
                                 >
                                     <div className="absolute -top-2 right-4 w-4 h-4 bg-white transform rotate-45 border-l border-t border-gray-200"></div>
                                     <div className="p-4">
-                                        <div className="text-center py-8">
-                                            <ShoppingCart size={48} className="mx-auto text-gray-300 mb-4" />
-                                            <p className="text-gray-500 font-medium">Chưa có sản phẩm nào</p>
-                                            <p className="text-sm text-gray-400 mt-1">Hãy thêm sản phẩm vào giỏ hàng</p>
-                                        </div>
+                                        {!cart || itemCount === 0 ? (
+                                            <div className="text-center py-8">
+                                                <ShoppingCart size={48} className="mx-auto text-gray-300 mb-4" />
+                                                <p className="text-gray-500 font-medium">Chưa có sản phẩm nào</p>
+                                                <p className="text-sm text-gray-400 mt-1">Hãy thêm sản phẩm vào giỏ hàng</p>
+                                            </div>
+                                        ) : (
+                                            <>
+                                                <h3 className="font-semibold text-lg mb-3">Sản phẩm mới thêm</h3>
+                                                <div className="max-h-96 overflow-y-auto space-y-3">
+                                                    {cart.items.map((item) => (
+                                                        <div key={item.id} className="flex gap-3 border-b pb-3">
+                                                            {item.product?.images?.[0] && (
+                                                                <img
+                                                                    src={item.product.images[0]}
+                                                                    alt={item.product.name}
+                                                                    className="w-16 h-16 object-cover rounded"
+                                                                />
+                                                            )}
+                                                            <div className="flex-1">
+                                                                <p className="text-sm font-medium line-clamp-2">{item.product?.name}</p>
+                                                                <div className="flex justify-between items-center mt-1">
+                                                                    <span className="text-orange-500 font-semibold">₫{Number(item.unitPrice).toLocaleString()}</span>
+                                                                    <span className="text-gray-500 text-sm">x{item.quantity}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                                <Link
+                                                    to="/cart"
+                                                    className="block w-full bg-orange-500 text-white text-center py-2 rounded-md mt-4 hover:bg-orange-600 transition-colors"
+                                                >
+                                                    Xem giỏ hàng
+                                                </Link>
+                                            </>
+                                        )}
                                     </div>
                                 </div>
                             )}
@@ -298,16 +337,21 @@ const Header = ({ navbarBelow = true }) => {
                     {!isMobile && (
                         <div className="relative">
                             <div
-                                className="flex items-center justify-center text-white hover:text-header-hover transition-colors duration-200 md:py-7 md:px-15 cursor-pointer"
+                                className="flex items-center justify-center text-white hover:text-header-hover transition-colors duration-200 md:py-7 md:px-15 cursor-pointer relative"
                                 onMouseEnter={() => setCartOpen(true)}
                                 onMouseLeave={() => setCartOpen(false)}
                             >
                                 <ShoppingCart size={26} />
+                                {itemCount > 0 && (
+                                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-semibold">
+                                        {itemCount}
+                                    </span>
+                                )}
                             </div>
 
                             {cartOpen && (
                                 <div
-                                    className="absolute right-1/4 -mt-5 w-80 bg-white text-gray-900 shadow-lg z-50 rounded-lg"
+                                    className="absolute right-1/4 -mt-5 w-96 bg-white text-gray-900 shadow-lg z-50 rounded-lg"
                                     onMouseEnter={() => setCartOpen(true)}
                                     onMouseLeave={() => setCartOpen(false)}
                                 >
@@ -315,11 +359,48 @@ const Header = ({ navbarBelow = true }) => {
                                     <div className="absolute -top-2 right-4 w-4 h-4 bg-white transform rotate-45 border-l border-t border-gray-200"></div>
 
                                     <div className="p-4">
-                                        <div className="text-center py-8">
-                                            <ShoppingCart size={48} className="mx-auto text-gray-300 mb-4" />
-                                            <p className="text-gray-500 font-medium">Chưa có sản phẩm nào</p>
-                                            <p className="text-sm text-gray-400 mt-1">Hãy thêm sản phẩm vào giỏ hàng</p>
-                                        </div>
+                                        {!cart || itemCount === 0 ? (
+                                            <div className="text-center py-8">
+                                                <ShoppingCart size={48} className="mx-auto text-gray-300 mb-4" />
+                                                <p className="text-gray-500 font-medium">Chưa có sản phẩm nào</p>
+                                                <p className="text-sm text-gray-400 mt-1">Hãy thêm sản phẩm vào giỏ hàng</p>
+                                            </div>
+                                        ) : (
+                                            <>
+                                                <h3 className="font-semibold text-lg mb-3">Sản phẩm mới thêm</h3>
+                                                <div className="max-h-96 overflow-y-auto space-y-3">
+                                                    {cart.items.map((item) => (
+                                                        <div key={item.id} className="flex gap-3 border-b pb-3">
+                                                            {item.product?.images?.[0] && (
+                                                                <img
+                                                                    src={item.product.images[0]}
+                                                                    alt={item.product.name}
+                                                                    className="w-16 h-16 object-cover rounded"
+                                                                />
+                                                            )}
+                                                            <div className="flex-1">
+                                                                <p className="text-sm font-medium line-clamp-2">{item.product?.name}</p>
+                                                                <div className="flex justify-between items-center mt-1">
+                                                                    <span className="text-orange-500 font-semibold">₫{Number(item.unitPrice).toLocaleString()}</span>
+                                                                    <span className="text-gray-500 text-sm">x{item.quantity}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                                <div className="flex gap-3 mt-4">
+                                                    <span className="text-sm text-gray-600">
+                                                        {itemCount} sản phẩm
+                                                    </span>
+                                                </div>
+                                                <Link
+                                                    to="/cart"
+                                                    className="block w-full bg-orange-500 text-white text-center py-2 rounded-md mt-3 hover:bg-orange-600 transition-colors"
+                                                >
+                                                    Xem giỏ hàng
+                                                </Link>
+                                            </>
+                                        )}
                                     </div>
                                 </div>
                             )}
