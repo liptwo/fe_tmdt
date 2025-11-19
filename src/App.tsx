@@ -6,6 +6,7 @@ import Layout from './layouts'
 import Home from './pages/Home'
 import ProductPage from './pages/ProductPage'
 import Cart from './pages/Cart'
+import OrderSuccess from './pages/OrderSuccess'
 import User from './pages/user/User'
 import UserProfile from './pages/user/Profile'
 import SellAndChatApp from './pages/user/Sell'
@@ -22,10 +23,11 @@ function App() {
           <Route path='/user/profile' element={<UserProfile />} />
           <Route path='/cart' element={<Cart />} />
           <Route path='/product' element={<ProductPage />} />
-          <Route path='checkout' element={<Checkout />} />
+          <Route path='/order-success' element={<OrderSuccess />} />
           <Route path='/channel/*' element={<SellAndChatApp />} />
           <Route path='*' element={<NotFound />} />
         </Route>
+        <Route path='/checkout' element={<Checkout />} />
         <Route path='/login' element={<Login />} />
         <Route path='/register' element={<Login />} />
       </Routes>

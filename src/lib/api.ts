@@ -198,6 +198,50 @@ export interface UpdateCartItemPayload {
   quantity: number
 }
 
+export interface ShippingAddress {
+  fullName: string
+  phoneNumber: string
+  address: string
+  city: string
+  district?: string
+  ward?: string
+}
+
+export interface CreateOrderPayload {
+  shippingAddress: ShippingAddress
+  paymentMethod: 'COD' | 'VNPAY' | 'BANK_TRANSFER'
+  note?: string
+}
+
+export interface OrderItem {
+  id: string
+  orderId: string
+  productId: string
+  quantity: number
+  unitPrice: string
+  product?: Product
+}
+
+export interface Order {
+  id: string
+  userId: string
+  orderNumber: string
+  status: string
+  totalAmount: string
+  shippingAddress: ShippingAddress
+  paymentMethod: string
+  paymentStatus: string
+  note?: string
+  items: OrderItem[]
+  createdAt: string
+  updatedAt: string
+}
+
+export interface CreateOrderResponse {
+  order: Order
+  paymentUrl?: string
+}
+
 export const cartApi = {
   getCart: (token: string) =>
     request<CartResponse>('/cart', {
@@ -238,6 +282,29 @@ export const cartApi = {
   clearCart: (token: string) =>
     request<CartResponse>('/cart/clear', {
       method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+}
+
+export const ordersApi = {
+  create: (token: string, payload: CreateOrderPayload) =>
+    request<CreateOrderResponse>('/orders', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }),
+  list: (token: string) =>
+    request<Order[]>('/orders', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }),
+  getById: (token: string, orderId: string) =>
+    request<Order>(`/orders/${orderId}`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
