@@ -574,6 +574,53 @@ const ProductPage = () => {
     }
   };
 
+  const handleBuyNow = async () => {
+    if (!productId || !isBackendProductId) {
+      setCartMessage("Không thể mua sản phẩm demo.");
+      setCartStatus("error");
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setCartMessage("Vui lòng đăng nhập để mua hàng.");
+      setCartStatus("error");
+      setTimeout(() => navigate("/login"), 1500);
+      return;
+    }
+
+    setCartStatus("loading");
+    setCartMessage(null);
+    try {
+      // Add to cart first
+      await cartApi.addItem(token, {
+        productId,
+        quantity,
+      });
+      
+      // Refresh cart
+      await refreshCart();
+      
+      console.log("[cart] Buy now - redirecting to checkout");
+      
+      // Navigate to checkout immediately
+      navigate("/checkout");
+    } catch (error) {
+      console.error("[cart] buy now failed", error);
+      setCartStatus("error");
+      if (error instanceof ApiError) {
+        if (error.status === 401) {
+          setCartMessage("Phiên đăng nhập không hợp lệ. Vui lòng đăng nhập lại.");
+          setTimeout(() => navigate("/login"), 2000);
+        } else {
+          setCartMessage(error.message);
+        }
+      } else {
+        setCartMessage("Không thể mua hàng. Vui lòng thử lại.");
+      }
+    }
+  };
+
   return (
     <div className="bg-white-50 min-h-screen text-black p-8">
       {productError && (
@@ -645,8 +692,12 @@ const ProductPage = () => {
                   <ShoppingCart className="w-4 h-4" />
                   {cartStatus === "loading" ? "Đang thêm..." : "Thêm vào giỏ"}
                 </button>
-                <button className="bg-orange-500 text-white px-6 py-2 rounded-md hover:bg-orange-600 transition-all">
-                  Mua ngay
+                <button
+                  onClick={handleBuyNow}
+                  disabled={cartStatus === "loading"}
+                  className="bg-orange-500 text-white px-6 py-2 rounded-md hover:bg-orange-600 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {cartStatus === "loading" ? "Đang xử lý..." : "Mua ngay"}
                 </button>
               </div>
               {cartMessage && (
