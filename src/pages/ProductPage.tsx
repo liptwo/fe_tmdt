@@ -581,7 +581,7 @@ const ProductPage = () => {
       return;
     }
 
-    const token = localStorage.getItem("token");
+    // Use token from useAuth context, same as handleAddToCart
     if (!token) {
       setCartMessage("Vui lòng đăng nhập để mua hàng.");
       setCartStatus("error");
@@ -592,6 +592,8 @@ const ProductPage = () => {
     setCartStatus("loading");
     setCartMessage(null);
     try {
+      console.log("[cart] Buy now - adding to cart first");
+      
       // Add to cart first
       await cartApi.addItem(token, {
         productId,
