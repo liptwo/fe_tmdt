@@ -515,7 +515,10 @@ const ProductPage = () => {
     try {
       console.log("[cart] adding item", {
         productId,
+        productIdLength: productId.length,
+        productIdCharCodes: Array.from(productId).map((c, i) => `${i}:${c.charCodeAt(0)}`).join(','),
         quantity,
+        quantityType: typeof quantity,
         tokenPreview: `${token.slice(0, 20)}…`,
         tokenExp: tokenInfo.exp ? new Date(tokenInfo.exp * 1000).toISOString() : 'unknown',
         tokenEmail: tokenInfo.email,

@@ -201,14 +201,21 @@ export const cartApi = {
         Authorization: `Bearer ${token}`
       }
     }),
-  addItem: (token: string, payload: AddCartItemPayload) =>
-    request<CartResponse>('/cart/items', {
+  addItem: (token: string, payload: AddCartItemPayload) => {
+    console.log('[cartApi.addItem] sending payload', {
+      payload,
+      stringified: JSON.stringify(payload),
+      productIdType: typeof payload.productId,
+      quantityType: typeof payload.quantity
+    })
+    return request<CartResponse>('/cart/items', {
       method: 'POST',
       body: JSON.stringify(payload),
       headers: {
         Authorization: `Bearer ${token}`
       }
     })
+  }
 }
 
 export { ApiError }
