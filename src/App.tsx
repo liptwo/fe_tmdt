@@ -7,6 +7,7 @@ import LayoutChat from './layouts/LayoutChat'
 import Home from './pages/Home'
 import ProductPage from './pages/ProductPage'
 import User from './pages/user/User'
+import DeleteAcc from './pages/user/DeleteAcc'
 import SellAndChatApp from './pages/user/Sell'
 import FloatingChatBox from './components/ui/FloatingChatBox'
 import NotFound from './pages/not-found'
@@ -17,10 +18,10 @@ function App() {
       <Routes>
         <Route path='/' element={<Layout />}>
           <Route index element={<Home />} />
-          <Route path='/user' element={<User />} />
           <Route path='/cart' />
+          <Route path='/account/delete' element={<DeleteAcc />} />
           <Route path='/product' element={<ProductPage />} />
-          <Route path='/user' element={<User />} />
+          <Route path='/user/*' element={<User />} />
           <Route path='/cart' />
           {/* thêm các route con ở đây */}
           <Route path='checkout' element={<Checkout />} />
