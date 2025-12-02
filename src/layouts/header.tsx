@@ -1,13 +1,19 @@
-import { Bell, FacebookIcon, GlobeIcon, HelpCircleIcon, Instagram, User, ShoppingCart } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
-import type { NavTopNavItem } from "@/types";
-import type { notifications } from "@/types";
-import { useState } from "react";
-import Logo from "@/components/icons/Logo";
-import { SearchBar } from "@/layouts/search-bar";
-import { useMobile } from "@/hooks/useMobile";
-import { useAuth } from "@/context/auth-context";
-import { useCart } from "@/context/cart-context";
+import {
+  Bell,
+  FacebookIcon,
+  GlobeIcon,
+  HelpCircleIcon,
+  Instagram,
+  User,
+  ShoppingCart
+} from 'lucide-react'
+import { Link } from 'react-router-dom'
+import type { NavTopNavItem } from '@/types'
+import type { notifications } from '@/types'
+import { useState } from 'react'
+import Logo from '@/assets/logo.png'
+import { SearchBar } from '@/layouts/search-bar'
+import { useMobile } from '@/hooks/useMobile'
 
 const navTopNavItemsLeft: NavTopNavItem[] = [
   {
@@ -59,23 +65,13 @@ const Header = ({ navbarBelow = true }) => {
     {}
   )
   const isMobile = useMobile()
-  const { user, logout } = useAuth()
-  const { cart, itemCount } = useCart()
-  const navigate = useNavigate()
 
   const setDropdownOpen = (name: string, isOpen: boolean) => {
     setDropdownStates((prev) => ({ ...prev, [name]: isOpen }))
   }
-
-  const userDisplayName = user?.fullName || user?.email || 'Đăng nhập'
-
-  const handleLogout = () => {
-    logout()
-    navigate('/login')
-  }
   return (
     <div
-      className=' sticky top-0 z-50 flex-col justify-center items-center py-2 px-1.5 md:py-1 md:px-4 md:10 lg:px-20 xl:px-40'
+      className='sticky top-0 z-50 flex-col justify-center py-2 px-1.5 md:py-1 md:px-4 md:10 lg:px-20 xl:px-40'
       style={{ background: 'var(--header-background)' }}
     >
       <div className=' justify-between text-[13px] p-1 hidden md:flex'>
@@ -193,78 +189,93 @@ const Header = ({ navbarBelow = true }) => {
                   onMouseLeave={() => setDropdownOpen(item.name, false)}
                 >
                   {item.icon ?? ''}
-                  {item.name === 'Kaito' ? userDisplayName : item.name}
+                  {item.name}
                 </div>
 
-                                {dropdownStates[item.name] && (
-                                    <div
-                                        className="absolute left-0 top-full mt-1 w-48 bg-white text-gray-900 shadow-lg z-50"
-                                        onMouseEnter={() => setDropdownOpen(item.name, true)}
-                                        onMouseLeave={() => setDropdownOpen(item.name, false)}
-                                    >
-                                        {/* Triangle arrow pointing up */}
-                                        <div className="absolute -top-2 left-4 w-4 h-4 bg-white transform rotate-45 border-l border-t border-gray-200"></div>
-                                        <div className="py-1">
-                                            {item.name === 'Tiếng Việt' ? (
-                                                <>
-                                                    <div className="block px-4 py-2 hover:bg-gray-100 rounded cursor-pointer font-medium">Tiếng Việt</div>
-                                                    <div className="block px-4 py-2 hover:bg-gray-100 rounded cursor-pointer font-medium">English</div>
-                                                    <div className="block px-4 py-2 hover:bg-gray-100 rounded cursor-pointer font-medium">中文</div>
-                                                </>
-                                            ) : item.name === 'Kaito' ? (
-                                                user ? (
-                                                    <>
-                                                        <Link to="/user/profile" className="block px-4 py-2 hover:bg-gray-100 rounded font-medium">Thông tin cá nhân</Link>
-                                                        <Link to="/user/orders" className="block px-4 py-2 hover:bg-gray-100 rounded font-medium">Đơn hàng của tôi</Link>
-                                                        <Link to="/user/favorites" className="block px-4 py-2 hover:bg-gray-100 rounded font-medium">Sản phẩm yêu thích</Link>
-                                                        <Link to="/user/settings" className="block px-4 py-2 hover:bg-gray-100 rounded font-medium">Cài đặt tài khoản</Link>
-                                                        <button
-                                                            type="button"
-                                                            onClick={handleLogout}
-                                                            className="block w-full text-left px-4 py-2 hover:bg-gray-100 rounded font-medium"
-                                                        >
-                                                            Đăng xuất
-                                                        </button>
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <Link to="/login" className="block px-4 py-2 hover:bg-gray-100 rounded font-medium">Đăng nhập</Link>
-                                                        <Link to="/register" className="block px-4 py-2 hover:bg-gray-100 rounded font-medium">Đăng ký</Link>
-                                                    </>
-                                                )
-                                            ) : null}
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        )
-                    ))}
-
-                </nav>
-
-            </div>
-            {/* Navbar below */}
-            {navbarBelow && (
-                <div className="flex items-center">
-                    <Logo className="text-[#fffeff] mr-12 hidden md:block" />
-                    <div className={`${isMobile ? 'flex-2' : 'flex-1'}`}>
-                        <SearchBar />
+                {dropdownStates[item.name] && (
+                  <div
+                    className='absolute left-0 top-full mt-1 w-48 bg-white text-gray-900 shadow-lg z-50'
+                    onMouseEnter={() => setDropdownOpen(item.name, true)}
+                    onMouseLeave={() => setDropdownOpen(item.name, false)}
+                  >
+                    {/* Triangle arrow pointing up */}
+                    <div className='absolute -top-2 left-4 w-4 h-4 bg-white transform rotate-45 border-l border-t border-gray-200'></div>
+                    <div className='py-1'>
+                      {item.name === 'Tiếng Việt' ? (
+                        <>
+                          <div className='block px-4 py-2 hover:bg-gray-100 rounded cursor-pointer font-medium'>
+                            Tiếng Việt
+                          </div>
+                          <div className='block px-4 py-2 hover:bg-gray-100 rounded cursor-pointer font-medium'>
+                            English
+                          </div>
+                          <div className='block px-4 py-2 hover:bg-gray-100 rounded cursor-pointer font-medium'>
+                            中文
+                          </div>
+                        </>
+                      ) : item.name === 'Kaito' ? (
+                        <>
+                          <Link
+                            to='/user/profile'
+                            className='block px-4 py-2 hover:bg-gray-100 rounded font-medium'
+                          >
+                            Thông tin cá nhân
+                          </Link>
+                          <Link
+                            to='/user/orders'
+                            className='block px-4 py-2 hover:bg-gray-100 rounded font-medium'
+                          >
+                            Đơn hàng của tôi
+                          </Link>
+                          <Link
+                            to='/user/favorites'
+                            className='block px-4 py-2 hover:bg-gray-100 rounded font-medium'
+                          >
+                            Sản phẩm yêu thích
+                          </Link>
+                          <Link
+                            to='/user/settings'
+                            className='block px-4 py-2 hover:bg-gray-100 rounded font-medium'
+                          >
+                            Cài đặt tài khoản
+                          </Link>
+                          <Link
+                            to='/logout'
+                            className='block px-4 py-2 hover:bg-gray-100 rounded font-medium'
+                          >
+                            Đăng xuất
+                          </Link>
+                        </>
+                      ) : null}
                     </div>
+                  </div>
+                )}
+              </div>
+            )
+          )}
+        </nav>
+      </div>
+      {/* Navbar below */}
+      {navbarBelow && (
+        <div className='flex items-center'>
+          <img
+            src={Logo}
+            alt='Logo'
+            className='text-[#fffeff] h-[5rem] mr-12 hidden md:block'
+          />
+          <div className={`${isMobile ? 'flex-2' : 'flex-1'}`}>
+            <SearchBar />
+          </div>
 
           {/* Mobile: Shopping Cart */}
           {isMobile && (
             <div className='relative flex-1 flex justify-center'>
               <div
-                className='flex items-center justify-center text-white hover:text-header-hover transition-colors duration-200 p-3 cursor-pointer relative'
+                className='flex items-center justify-center text-white hover:text-header-hover transition-colors duration-200 p-3 cursor-pointer'
                 onMouseEnter={() => setCartOpen(true)}
                 onMouseLeave={() => setCartOpen(false)}
               >
                 <ShoppingCart size={20} />
-                {itemCount > 0 && (
-                  <span className='absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-semibold'>
-                    {itemCount}
-                  </span>
-                )}
               </div>
               {cartOpen && (
                 <div
@@ -274,61 +285,18 @@ const Header = ({ navbarBelow = true }) => {
                 >
                   <div className='absolute -top-2 right-4 w-4 h-4 bg-white transform rotate-45 border-l border-t border-gray-200'></div>
                   <div className='p-4'>
-                    {!cart || itemCount === 0 ? (
-                      <div className='text-center py-8'>
-                        <ShoppingCart
-                          size={48}
-                          className='mx-auto text-gray-300 mb-4'
-                        />
-                        <p className='text-gray-500 font-medium'>
-                          Chưa có sản phẩm nào
-                        </p>
-                        <p className='text-sm text-gray-400 mt-1'>
-                          Hãy thêm sản phẩm vào giỏ hàng
-                        </p>
-                      </div>
-                    ) : (
-                      <>
-                        <h3 className='font-semibold text-lg mb-3'>
-                          Sản phẩm mới thêm
-                        </h3>
-                        <div className='max-h-96 overflow-y-auto space-y-3'>
-                          {cart.items.map((item) => (
-                            <div
-                              key={item.id}
-                              className='flex gap-3 border-b pb-3'
-                            >
-                              {item.product?.images?.[0] && (
-                                <img
-                                  src={item.product.images[0]}
-                                  alt={item.product.name}
-                                  className='w-16 h-16 object-cover rounded'
-                                />
-                              )}
-                              <div className='flex-1'>
-                                <p className='text-sm font-medium line-clamp-2'>
-                                  {item.product?.name}
-                                </p>
-                                <div className='flex justify-between items-center mt-1'>
-                                  <span className='text-orange-500 font-semibold'>
-                                    ₫{Number(item.unitPrice).toLocaleString()}
-                                  </span>
-                                  <span className='text-gray-500 text-sm'>
-                                    x{item.quantity}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                        <Link
-                          to='/cart'
-                          className='block w-full bg-orange-500 text-white text-center py-2 rounded-md mt-4 hover:bg-orange-600 transition-colors'
-                        >
-                          Xem giỏ hàng
-                        </Link>
-                      </>
-                    )}
+                    <div className='text-center py-8'>
+                      <ShoppingCart
+                        size={48}
+                        className='mx-auto text-gray-300 mb-4'
+                      />
+                      <p className='text-gray-500 font-medium'>
+                        Chưa có sản phẩm nào
+                      </p>
+                      <p className='text-sm text-gray-400 mt-1'>
+                        Hãy thêm sản phẩm vào giỏ hàng
+                      </p>
+                    </div>
                   </div>
                 </div>
               )}
@@ -353,56 +321,36 @@ const Header = ({ navbarBelow = true }) => {
                 >
                   <div className='absolute -top-2 right-4 w-4 h-4 bg-white transform rotate-45 border-l border-t border-gray-200'></div>
                   <div className='py-1'>
-                    {user ? (
-                      <>
-                        <Link
-                          to='/user/profile'
-                          className='block px-4 py-2 hover:bg-gray-100 rounded font-medium'
-                        >
-                          Thông tin cá nhân
-                        </Link>
-                        <Link
-                          to='/user/orders'
-                          className='block px-4 py-2 hover:bg-gray-100 rounded font-medium'
-                        >
-                          Đơn hàng của tôi
-                        </Link>
-                        <Link
-                          to='/user/favorites'
-                          className='block px-4 py-2 hover:bg-gray-100 rounded font-medium'
-                        >
-                          Sản phẩm yêu thích
-                        </Link>
-                        <Link
-                          to='/user/settings'
-                          className='block px-4 py-2 hover:bg-gray-100 rounded font-medium'
-                        >
-                          Cài đặt tài khoản
-                        </Link>
-                        <button
-                          type='button'
-                          onClick={handleLogout}
-                          className='block w-full text-left px-4 py-2 hover:bg-gray-100 rounded font-medium'
-                        >
-                          Đăng xuất
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <Link
-                          to='/login'
-                          className='block px-4 py-2 hover:bg-gray-100 rounded font-medium'
-                        >
-                          Đăng nhập
-                        </Link>
-                        <Link
-                          to='/register'
-                          className='block px-4 py-2 hover:bg-gray-100 rounded font-medium'
-                        >
-                          Đăng ký
-                        </Link>
-                      </>
-                    )}
+                    <Link
+                      to='/user/profile'
+                      className='block px-4 py-2 hover:bg-gray-100 rounded font-medium'
+                    >
+                      Thông tin cá nhân
+                    </Link>
+                    <Link
+                      to='/user/orders'
+                      className='block px-4 py-2 hover:bg-gray-100 rounded font-medium'
+                    >
+                      Đơn hàng của tôi
+                    </Link>
+                    <Link
+                      to='/user/favorites'
+                      className='block px-4 py-2 hover:bg-gray-100 rounded font-medium'
+                    >
+                      Sản phẩm yêu thích
+                    </Link>
+                    <Link
+                      to='/user/settings'
+                      className='block px-4 py-2 hover:bg-gray-100 rounded font-medium'
+                    >
+                      Cài đặt tài khoản
+                    </Link>
+                    <Link
+                      to='/logout'
+                      className='block px-4 py-2 hover:bg-gray-100 rounded font-medium'
+                    >
+                      Đăng xuất
+                    </Link>
                   </div>
                 </div>
               )}
@@ -413,21 +361,16 @@ const Header = ({ navbarBelow = true }) => {
           {!isMobile && (
             <div className='relative'>
               <div
-                className='flex items-center justify-center text-white hover:text-header-hover transition-colors duration-200 md:py-7 md:px-15 cursor-pointer relative'
+                className='flex items-center justify-center text-white hover:text-header-hover transition-colors duration-200 md:py-7 md:px-15 cursor-pointer'
                 onMouseEnter={() => setCartOpen(true)}
                 onMouseLeave={() => setCartOpen(false)}
               >
                 <ShoppingCart size={26} />
-                {itemCount > 0 && (
-                  <span className='absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-semibold'>
-                    {itemCount}
-                  </span>
-                )}
               </div>
 
               {cartOpen && (
                 <div
-                  className='absolute right-1/4 -mt-5 w-96 bg-white text-gray-900 shadow-lg z-50 rounded-lg'
+                  className='absolute right-1/4 -mt-5 w-80 bg-white text-gray-900 shadow-lg z-50 rounded-lg'
                   onMouseEnter={() => setCartOpen(true)}
                   onMouseLeave={() => setCartOpen(false)}
                 >
@@ -435,66 +378,18 @@ const Header = ({ navbarBelow = true }) => {
                   <div className='absolute -top-2 right-4 w-4 h-4 bg-white transform rotate-45 border-l border-t border-gray-200'></div>
 
                   <div className='p-4'>
-                    {!cart || itemCount === 0 ? (
-                      <div className='text-center py-8'>
-                        <ShoppingCart
-                          size={48}
-                          className='mx-auto text-gray-300 mb-4'
-                        />
-                        <p className='text-gray-500 font-medium'>
-                          Chưa có sản phẩm nào
-                        </p>
-                        <p className='text-sm text-gray-400 mt-1'>
-                          Hãy thêm sản phẩm vào giỏ hàng
-                        </p>
-                      </div>
-                    ) : (
-                      <>
-                        <h3 className='font-semibold text-lg mb-3'>
-                          Sản phẩm mới thêm
-                        </h3>
-                        <div className='max-h-96 overflow-y-auto space-y-3'>
-                          {cart.items.map((item) => (
-                            <div
-                              key={item.id}
-                              className='flex gap-3 border-b pb-3'
-                            >
-                              {item.product?.images?.[0] && (
-                                <img
-                                  src={item.product.images[0]}
-                                  alt={item.product.name}
-                                  className='w-16 h-16 object-cover rounded'
-                                />
-                              )}
-                              <div className='flex-1'>
-                                <p className='text-sm font-medium line-clamp-2'>
-                                  {item.product?.name}
-                                </p>
-                                <div className='flex justify-between items-center mt-1'>
-                                  <span className='text-orange-500 font-semibold'>
-                                    ₫{Number(item.unitPrice).toLocaleString()}
-                                  </span>
-                                  <span className='text-gray-500 text-sm'>
-                                    x{item.quantity}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                        <div className='flex gap-3 mt-4'>
-                          <span className='text-sm text-gray-600'>
-                            {itemCount} sản phẩm
-                          </span>
-                        </div>
-                        <Link
-                          to='/cart'
-                          className='block w-full bg-orange-500 text-white text-center py-2 rounded-md mt-3 hover:bg-orange-600 transition-colors'
-                        >
-                          Xem giỏ hàng
-                        </Link>
-                      </>
-                    )}
+                    <div className='text-center py-8'>
+                      <ShoppingCart
+                        size={48}
+                        className='mx-auto text-gray-300 mb-4'
+                      />
+                      <p className='text-gray-500 font-medium'>
+                        Chưa có sản phẩm nào
+                      </p>
+                      <p className='text-sm text-gray-400 mt-1'>
+                        Hãy thêm sản phẩm vào giỏ hàng
+                      </p>
+                    </div>
                   </div>
                 </div>
               )}
