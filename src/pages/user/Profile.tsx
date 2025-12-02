@@ -1,7 +1,28 @@
 // import { Avatar } from "@radix-ui/react-avatar";
-import React, { useState, useEffect } from "react";
+import { useEffect } from 'react'
+import { Navigate } from 'react-router-dom'
+import { useAuth } from '@/context/auth-context'
 
-const Profile = () => {
+const UserProfile = () => {
+  const { user, isLoading, refreshProfile } = useAuth()
+
+  useEffect(() => {
+    if (!user) {
+      void refreshProfile()
+    }
+  }, [user, refreshProfile])
+
+  if (isLoading) {
+    return (
+      <div className='flex items-center justify-center py-16'>
+        <p className='text-lg text-gray-500'>Đang tải thông tin tài khoản...</p>
+      </div>
+    )
+  }
+
+  if (!user) {
+    return <Navigate to='/login' replace />
+  }
     const [isEditEmail, setIsEditEmail] = useState(false)
     const [isEditNPhone, setIsEditNPhone] = useState(false)
 
@@ -97,7 +118,7 @@ const Profile = () => {
                                     <td>
                                         <input
                                             name="name"
-                                            value={profile.name}
+                                            value={user.fullName}
                                             onChange={handleChange}
                                             type="text"
                                             className="border border-gray-300 w-full p-2 rounded-md focus:ring-2 focus:ring-amber-400 outline-none"
@@ -113,7 +134,7 @@ const Profile = () => {
                                             {isEditEmail ? (<input
 
                                                 name="email"
-                                                // value={profile.email}
+                                                // value={user.email}
                                                 onChange={handleChange}
                                                 type="text"
                                                 className="border-none border-gray-300 w-full p-2 rounded-md  outline-none"

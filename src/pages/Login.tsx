@@ -13,20 +13,39 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import type { FormEvent } from 'react'
+import { ApiError, authApi } from '@/lib/api'
+import { useAuth } from '@/context/auth-context'
 export function Login() {
   const location = useLocation()
   const isRegister = location.pathname === '/register'
-  console.log('isRegister', isRegister)
   const navigate = useNavigate()
+  const { setSession } = useAuth()
 
+  const [fullName, setFullName] = useState('')
   const [phone, setPhone] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isRegistering, setIsRegistering] = useState(false)
 
-  const handleRegisterSubmit = (e) => {
+  useEffect(() => {
+    setError('')
+    setSuccess('')
+    setIsSubmitting(false)
+    setIsRegistering(false)
+  }, [isRegister])
+
+  const handleRegisterSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+
+    if (!fullName.trim()) {
+      setError('Vui lòng nhập họ và tên')
+      return
+    }
 
     // Kiểm tra số điện thoại Việt Nam: 10 số, bắt đầu 0
     const phoneRegex = /^0\d{9}$/
@@ -35,25 +54,70 @@ export function Login() {
       return
     }
 
+    if (!email.trim()) {
+      setError('Vui lòng nhập email')
+      return
+    }
+
     if (password.length < 6) {
       setError('Mật khẩu phải ít nhất 6 ký tự')
       return
     }
 
     setError('')
-    // TODO: Gọi API đăng ký ở đây
-    console.log('Đăng ký thành công:', { phone, email, password })
+    setSuccess('')
+    setIsRegistering(true)
+    try {
+      await authApi.register({
+        email: email.trim(),
+        password,
+        fullName: fullName.trim()
+      })
+      setSuccess('Đăng ký thành công! Vui lòng đăng nhập.')
+      setPhone('')
+      setEmail('')
+      setPassword('')
+      setFullName('')
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setError(err.message)
+      } else {
+        setError('Không thể đăng ký. Vui lòng thử lại sau.')
+      }
+    } finally {
+      setIsRegistering(false)
+    }
   }
 
-  const handleLoginSubmit = (e: any) => {
+  const handleLoginSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    if (!email.trim()) {
+      setError('Vui lòng nhập email')
+      return
+    }
     if (password.length < 6) {
       setError('Mật khẩu phải ít nhất 6 ký tự')
       return
     }
     setError('')
-    // TODO: Gọi API đăng nhập
-    console.log('Đăng nhập:', { email, password })
+    setSuccess('')
+    setIsSubmitting(true)
+    try {
+      const response = await authApi.login({
+        email: email.trim(),
+        password
+      })
+      setSession(response.access_token, response.user)
+      navigate('/', { replace: true })
+    } catch (err) {
+      if (err instanceof ApiError) {
+        setError(err.message)
+      } else {
+        setError('Không thể đăng nhập. Vui lòng thử lại sau.')
+      }
+    } finally {
+      setIsSubmitting(false)
+    }
   }
   return (
     <div className=' flex flex-col items-center justify-center gap-6 bg-sky-50 overflow-x-hidden'>
@@ -117,14 +181,35 @@ export function Login() {
 
             <CardContent>
               {error && <p className='text-red-500 mb-2'>{error}</p>}
+              {success && <p className='text-green-600 mb-2'>{success}</p>}
               {isRegister ? (
-                <form>
+                <form id='register-form' onSubmit={handleRegisterSubmit}>
                   <div className='flex flex-col gap-6'>
+                    <div className='grid gap-2'>
+                      <div className='flex items-center'>
+                        <Label htmlFor='fullName'>Họ và tên</Label>
+                      </div>
+                      <Input
+                        id='fullName'
+                        type='text'
+                        placeholder='Nhập họ tên'
+                        required
+                        value={fullName}
+                        onChange={(event) => setFullName(event.target.value)}
+                      />
+                    </div>
                     <div className='grid gap-2'>
                       <div className='flex items-center'>
                         <Label htmlFor='sdt'>Số điện thoại</Label>
                       </div>
-                      <Input id='sdt' type='sdt' placeholder='Nhập số điện thoại  ' required />
+                      <Input
+                        id='sdt'
+                        type='tel'
+                        placeholder='Nhập số điện thoại'
+                        required
+                        value={phone}
+                        onChange={(event) => setPhone(event.target.value)}
+                      />
                     </div>
                     <div className='grid gap-2'>
                       <Label htmlFor='email'>Email</Label>
@@ -133,18 +218,27 @@ export function Login() {
                         type='email'
                         placeholder='m@example.com'
                         required
+                        value={email}
+                        onChange={(event) => setEmail(event.target.value)}
                       />
                     </div>
                     <div className='grid gap-2'>
                       <div className='flex items-center'>
                         <Label htmlFor='password'>Mật khẩu</Label>
                       </div>
-                      <Input id='password' type='password' placeholder='Nhập mật khẩu  ' required />
+                      <Input
+                        id='password'
+                        type='password'
+                        placeholder='Nhập mật khẩu'
+                        required
+                        value={password}
+                        onChange={(event) => setPassword(event.target.value)}
+                      />
                     </div>
                   </div>
                 </form>
               ) : (
-                <form>
+                <form id='login-form' onSubmit={handleLoginSubmit}>
                   <div className='flex flex-col gap-6'>
                     <div className='grid gap-2'>
                       <Label htmlFor='email'>Email</Label>
@@ -153,6 +247,8 @@ export function Login() {
                         type='email'
                         placeholder='m@example.com'
                         required
+                        value={email}
+                        onChange={(event) => setEmail(event.target.value)}
                       />
                     </div>
                     <div className='grid gap-2'>
@@ -165,7 +261,14 @@ export function Login() {
                           Quên mật khẩu?
                         </a>
                       </div>
-                      <Input id='password' type='password' placeholder='Nhập mật khẩu  ' required />
+                      <Input
+                        id='password'
+                        type='password'
+                        placeholder='Nhập mật khẩu'
+                        required
+                        value={password}
+                        onChange={(event) => setPassword(event.target.value)}
+                      />
                     </div>
                   </div>
                 </form>
@@ -176,10 +279,12 @@ export function Login() {
                 <>
                   <Button
                     type='submit'
-                    onClick={handleRegisterSubmit}
+                    form='register-form'
                     className='w-full'
+                    disabled={isRegistering}
+                    aria-busy={isRegistering}
                   >
-                    Đăng ký
+                    {isRegistering ? 'Đang đăng ký...' : 'Đăng ký'}
                   </Button>
                   <Separator className='my-2 w-full' />
                   <Button variant='outline' className='w-full'>
@@ -206,10 +311,12 @@ export function Login() {
                 <>
                   <Button
                     type='submit'
-                    onClick={handleLoginSubmit}
+                    form='login-form'
                     className='w-full'
+                    disabled={isSubmitting}
+                    aria-busy={isSubmitting}
                   >
-                    Đăng nhập
+                    {isSubmitting ? 'Đang đăng nhập...' : 'Đăng nhập'}
                   </Button>
                   <Separator className='my-2 w-full' />
                   <Button variant='outline' className='w-full'>
