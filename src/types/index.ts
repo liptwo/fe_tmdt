@@ -12,3 +12,18 @@ export interface notifications {
     image: string;
     link?: string;
 }
+
+
+export interface FeatBanner {
+    href: string;
+    title: string;
+    image: string;
+}
+
+export interface TopProducts {
+    id: number;
+    title: string;
+    image: string;
+    sales: string;
+    href: string;
+}
