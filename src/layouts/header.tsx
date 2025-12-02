@@ -1,22 +1,13 @@
-import {
-  Bell,
-  FacebookIcon,
-  GlobeIcon,
-  HelpCircleIcon,
-  Instagram,
-  User,
-  ShoppingCart
-} from 'lucide-react'
-import { Link, useNavigate } from 'react-router-dom'
-import type { NavTopNavItem } from '@/types'
-import type { notifications } from '@/types'
-import { useState } from 'react'
-// import Logo from "@/components/icons/Logo";
-import Logo from '@/assets/logoNew.png'
-import { SearchBar } from '@/layouts/search-bar'
-import { useMobile } from '@/hooks/useMobile'
-import { useAuth } from '@/context/auth-context'
-import { useCart } from '@/context/cart-context'
+import { Bell, FacebookIcon, GlobeIcon, HelpCircleIcon, Instagram, User, ShoppingCart } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import type { NavTopNavItem } from "@/types";
+import type { notifications } from "@/types";
+import { useState } from "react";
+import Logo from "@/components/icons/Logo";
+import { SearchBar } from "@/layouts/search-bar";
+import { useMobile } from "@/hooks/useMobile";
+import { useAuth } from "@/context/auth-context";
+import { useCart } from "@/context/cart-context";
 
 const navTopNavItemsLeft: NavTopNavItem[] = [
   {
@@ -205,99 +196,60 @@ const Header = ({ navbarBelow = true }) => {
                   {item.name === 'Kaito' ? userDisplayName : item.name}
                 </div>
 
-                {dropdownStates[item.name] && (
-                  <div
-                    className='absolute left-0 top-full mt-1 w-48 bg-white text-gray-900 shadow-lg z-50'
-                    onMouseEnter={() => setDropdownOpen(item.name, true)}
-                    onMouseLeave={() => setDropdownOpen(item.name, false)}
-                  >
-                    {/* Triangle arrow pointing up */}
-                    <div className='absolute -top-2 left-4 w-4 h-4 bg-white transform rotate-45 border-l border-t border-gray-200'></div>
-                    <div className='py-1'>
-                      {item.name === 'Tiếng Việt' ? (
-                        <>
-                          <div className='block px-4 py-2 hover:bg-gray-100 rounded cursor-pointer font-medium'>
-                            Tiếng Việt
-                          </div>
-                          <div className='block px-4 py-2 hover:bg-gray-100 rounded cursor-pointer font-medium'>
-                            English
-                          </div>
-                          <div className='block px-4 py-2 hover:bg-gray-100 rounded cursor-pointer font-medium'>
-                            中文
-                          </div>
-                        </>
-                      ) : item.name === 'Kaito' ? (
-                        user ? (
-                          <>
-                            <Link
-                              to='/user/profile'
-                              className='block px-4 py-2 hover:bg-gray-100 rounded font-medium'
-                            >
-                              Thông tin cá nhân
-                            </Link>
-                            <Link
-                              to='/user/orders'
-                              className='block px-4 py-2 hover:bg-gray-100 rounded font-medium'
-                            >
-                              Đơn hàng của tôi
-                            </Link>
-                            <Link
-                              to='/user/favorites'
-                              className='block px-4 py-2 hover:bg-gray-100 rounded font-medium'
-                            >
-                              Sản phẩm yêu thích
-                            </Link>
-                            <Link
-                              to='/user/settings'
-                              className='block px-4 py-2 hover:bg-gray-100 rounded font-medium'
-                            >
-                              Cài đặt tài khoản
-                            </Link>
-                            <button
-                              type='button'
-                              onClick={handleLogout}
-                              className='block w-full text-left px-4 py-2 hover:bg-gray-100 rounded font-medium'
-                            >
-                              Đăng xuất
-                            </button>
-                          </>
-                        ) : (
-                          <>
-                            <Link
-                              to='/login'
-                              className='block px-4 py-2 hover:bg-gray-100 rounded font-medium'
-                            >
-                              Đăng nhập
-                            </Link>
-                            <Link
-                              to='/register'
-                              className='block px-4 py-2 hover:bg-gray-100 rounded font-medium'
-                            >
-                              Đăng ký
-                            </Link>
-                          </>
+                                {dropdownStates[item.name] && (
+                                    <div
+                                        className="absolute left-0 top-full mt-1 w-48 bg-white text-gray-900 shadow-lg z-50"
+                                        onMouseEnter={() => setDropdownOpen(item.name, true)}
+                                        onMouseLeave={() => setDropdownOpen(item.name, false)}
+                                    >
+                                        {/* Triangle arrow pointing up */}
+                                        <div className="absolute -top-2 left-4 w-4 h-4 bg-white transform rotate-45 border-l border-t border-gray-200"></div>
+                                        <div className="py-1">
+                                            {item.name === 'Tiếng Việt' ? (
+                                                <>
+                                                    <div className="block px-4 py-2 hover:bg-gray-100 rounded cursor-pointer font-medium">Tiếng Việt</div>
+                                                    <div className="block px-4 py-2 hover:bg-gray-100 rounded cursor-pointer font-medium">English</div>
+                                                    <div className="block px-4 py-2 hover:bg-gray-100 rounded cursor-pointer font-medium">中文</div>
+                                                </>
+                                            ) : item.name === 'Kaito' ? (
+                                                user ? (
+                                                    <>
+                                                        <Link to="/user/profile" className="block px-4 py-2 hover:bg-gray-100 rounded font-medium">Thông tin cá nhân</Link>
+                                                        <Link to="/user/orders" className="block px-4 py-2 hover:bg-gray-100 rounded font-medium">Đơn hàng của tôi</Link>
+                                                        <Link to="/user/favorites" className="block px-4 py-2 hover:bg-gray-100 rounded font-medium">Sản phẩm yêu thích</Link>
+                                                        <Link to="/user/settings" className="block px-4 py-2 hover:bg-gray-100 rounded font-medium">Cài đặt tài khoản</Link>
+                                                        <button
+                                                            type="button"
+                                                            onClick={handleLogout}
+                                                            className="block w-full text-left px-4 py-2 hover:bg-gray-100 rounded font-medium"
+                                                        >
+                                                            Đăng xuất
+                                                        </button>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Link to="/login" className="block px-4 py-2 hover:bg-gray-100 rounded font-medium">Đăng nhập</Link>
+                                                        <Link to="/register" className="block px-4 py-2 hover:bg-gray-100 rounded font-medium">Đăng ký</Link>
+                                                    </>
+                                                )
+                                            ) : null}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                         )
-                      ) : null}
+                    ))}
+
+                </nav>
+
+            </div>
+            {/* Navbar below */}
+            {navbarBelow && (
+                <div className="flex items-center">
+                    <Logo className="text-[#fffeff] mr-12 hidden md:block" />
+                    <div className={`${isMobile ? 'flex-2' : 'flex-1'}`}>
+                        <SearchBar />
                     </div>
-                  </div>
-                )}
-              </div>
-            )
-          )}
-        </nav>
-      </div>
-      {/* Navbar below */}
-      {navbarBelow && (
-        <div className='flex items-center '>
-          <img
-            src={Logo}
-            alt='Logo'
-            className='text-[#fffeff] mr-12 hidden md:block w-auto h-[65px] cursor-pointer'
-            onClick={() => navigate('/')}
-          />
-          <div className={`${isMobile ? 'flex-2' : 'flex-1'}`}>
-            <SearchBar />
-          </div>
 
           {/* Mobile: Shopping Cart */}
           {isMobile && (
