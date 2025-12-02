@@ -8,7 +8,7 @@ import ProductPage from './pages/ProductPage'
 import Cart from './pages/Cart'
 import OrderSuccess from './pages/OrderSuccess'
 import User from './pages/user/User'
-import UserProfile from './pages/user/Profile'
+import DeleteAcc from './pages/user/DeleteAcc'
 import SellAndChatApp from './pages/user/Sell'
 import FloatingChatBox from './components/ui/FloatingChatBox'
 import NotFound from './pages/not-found'
@@ -19,11 +19,14 @@ function App() {
       <Routes>
         <Route path='/' element={<Layout />}>
           <Route index element={<Home />} />
-          <Route path='/user' element={<User />} />
-          <Route path='/user/profile' element={<UserProfile />} />
           <Route path='/cart' element={<Cart />} />
-          <Route path='/product' element={<ProductPage />} />
           <Route path='/order-success' element={<OrderSuccess />} />
+          <Route path='/account/delete' element={<DeleteAcc />} />
+          <Route path='/product' element={<ProductPage />} />
+          <Route path='/user/*' element={<User />} />
+          {/* thêm các route con ở đây */}
+          <Route path='checkout' element={<Checkout />} />
+          <Route path='*' element={<NotFound />} />
           <Route path='/channel/*' element={<SellAndChatApp />} />
           <Route path='*' element={<NotFound />} />
         </Route>
