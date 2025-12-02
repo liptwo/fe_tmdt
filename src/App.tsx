@@ -12,6 +12,7 @@ import UserProfile from './pages/user/Profile'
 import SellAndChatApp from './pages/user/Sell'
 import FloatingChatBox from './components/ui/FloatingChatBox'
 import NotFound from './pages/not-found'
+import SearchPage from './pages/Search'
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
           <Route path='/product' element={<ProductPage />} />
           <Route path='/order-success' element={<OrderSuccess />} />
           <Route path='/channel/*' element={<SellAndChatApp />} />
+          <Route path='/search' element={<SearchPage />} />
           <Route path='*' element={<NotFound />} />
         </Route>
         <Route path='/checkout' element={<Checkout />} />
