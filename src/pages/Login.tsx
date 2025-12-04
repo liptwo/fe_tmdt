@@ -291,7 +291,7 @@ export function Login() {
                     Đăng ký với Google
                   </Button>
                   <div className='text-sm mt-2 flex justify-center items-center flex-wrap text-muted-foreground'>
-                    Bằng việc đăng kí, bạn đã đồng ý với Shopee về &&nbsp;
+                    Bằng việc đăng kí, bạn đã đồng ý với Onine Shop về &&nbsp;
                     <span className='text-red-500'> Điều khoản dịch vụ </span>
                     &nbsp;&&nbsp;
                     <span className='text-red-500'> Chính sách bảo mật </span>
