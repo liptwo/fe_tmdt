@@ -9,10 +9,10 @@ const Vouchers = () => {
     LIVE15: {
       name: "Giảm 15% tối đa 1.000.000đ",
       condition: "Đơn tối thiểu 5.000.000đ",
-      note: "Chỉ áp dụng trên Shopee Live",
+      note: "Chỉ áp dụng trên Online Shop Live",
       expire: "Hiệu lực 2 ngày",
       tag: "Mới",
-      leftLabel: "SHOPEE LIVE",
+      leftLabel: "Online Shop LIVE",
     },
     FREESHIP: {
       name: "Miễn phí vận chuyển toàn quốc",

@@ -13,7 +13,7 @@ import SellAndChatApp from './pages/user/Sell'
 import FloatingChatBox from './components/ui/FloatingChatBox'
 import NotFound from './pages/not-found'
 import SearchPage from './pages/Search'
-
+import Ninga from './assets/image.png'
 function App() {
   return (
     <div className='relative'>

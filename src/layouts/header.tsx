@@ -7,19 +7,21 @@ import {
   User,
   ShoppingCart
 } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import type { NavTopNavItem } from '@/types'
 import type { notifications } from '@/types'
 import { useState } from 'react'
 import Logo from '@/assets/logo.png'
 import { SearchBar } from '@/layouts/search-bar'
 import { useMobile } from '@/hooks/useMobile'
+import { useAuth } from '@/context/auth-context'
+import { useCart } from '@/context/cart-context'
 
 const navTopNavItemsLeft: NavTopNavItem[] = [
-  {
-    name: 'Kênh Người Bán',
-    to: '/channel'
-  },
+  // {
+  //   name: 'Kênh Người Bán',
+  //   to: '/channel'
+  // },
   {
     name: 'Tải ứng dụng',
     to: '/download'
@@ -35,11 +37,6 @@ const navTopNavItemsRight: NavTopNavItem[] = [
   {
     name: 'Tiếng Việt',
     icon: <GlobeIcon size={18} />
-  },
-  {
-    name: 'Kaito',
-    icon: <User size={18} />,
-    to: '/user/profile'
   }
 ]
 
@@ -68,6 +65,16 @@ const Header = ({ navbarBelow = true }) => {
 
   const setDropdownOpen = (name: string, isOpen: boolean) => {
     setDropdownStates((prev) => ({ ...prev, [name]: isOpen }))
+  }
+  const { user, logout } = useAuth()
+  const { cart, itemCount } = useCart()
+  const navigate = useNavigate()
+
+  const userDisplayName = user?.fullName || user?.email
+
+  const handleLogout = () => {
+    logout()
+    navigate('/login')
   }
   return (
     <div
@@ -182,7 +189,7 @@ const Header = ({ navbarBelow = true }) => {
                 {item.name}
               </Link>
             ) : (
-              <div key={item.name} className='relative'>
+              <div key={item.name} className='relative '>
                 <div
                   className='pr-4 flex gap-2 items-center text-white hover:text-header-hover transition-colors cursor-pointer font-light'
                   onMouseEnter={() => setDropdownOpen(item.name, true)}
@@ -194,7 +201,7 @@ const Header = ({ navbarBelow = true }) => {
 
                 {dropdownStates[item.name] && (
                   <div
-                    className='absolute left-0 top-full mt-1 w-48 bg-white text-gray-900 shadow-lg z-50'
+                    className='absolute left-0 top-full mt-1 w-48 bg-white text-gray-900 shadow-lg z-50 rounded'
                     onMouseEnter={() => setDropdownOpen(item.name, true)}
                     onMouseLeave={() => setDropdownOpen(item.name, false)}
                   >
@@ -213,45 +220,69 @@ const Header = ({ navbarBelow = true }) => {
                             中文
                           </div>
                         </>
-                      ) : item.name === 'Kaito' ? (
-                        <>
-                          <Link
-                            to='/user/profile'
-                            className='block px-4 py-2 hover:bg-gray-100 rounded font-medium'
-                          >
-                            Thông tin cá nhân
-                          </Link>
-                          <Link
-                            to='/user/orders'
-                            className='block px-4 py-2 hover:bg-gray-100 rounded font-medium'
-                          >
-                            Đơn hàng của tôi
-                          </Link>
-                          <Link
-                            to='/user/favorites'
-                            className='block px-4 py-2 hover:bg-gray-100 rounded font-medium'
-                          >
-                            Sản phẩm yêu thích
-                          </Link>
-                          <Link
-                            to='/user/settings'
-                            className='block px-4 py-2 hover:bg-gray-100 rounded font-medium'
-                          >
-                            Cài đặt tài khoản
-                          </Link>
-                          <Link
-                            to='/logout'
-                            className='block px-4 py-2 hover:bg-gray-100 rounded font-medium'
-                          >
-                            Đăng xuất
-                          </Link>
-                        </>
                       ) : null}
                     </div>
                   </div>
                 )}
               </div>
             )
+          )}
+          {/* Auth Section */}
+          {user ? (
+            <div className='relative'>
+              <div
+                className='pr-4 flex gap-2 items-center text-white hover:text-header-hover transition-colors cursor-pointer font-light'
+                onMouseEnter={() => setDropdownOpen('user-menu', true)}
+                onMouseLeave={() => setDropdownOpen('user-menu', false)}
+              >
+                <User size={18} />
+                {userDisplayName}
+              </div>
+              {dropdownStates['user-menu'] && (
+                <div
+                  className='absolute right-0 top-full mt-1 w-48 bg-white text-gray-900 shadow-lg z-50 rounded'
+                  onMouseEnter={() => setDropdownOpen('user-menu', true)}
+                  onMouseLeave={() => setDropdownOpen('user-menu', false)}
+                >
+                  <div className='absolute -top-2 right-4 w-4 h-4 bg-white transform rotate-45 border-l border-t border-gray-200'></div>
+                  <div className='py-1'>
+                    <Link
+                      to='/user/profile'
+                      className='block px-4 py-2 hover:bg-gray-100 rounded font-medium'
+                    >
+                      Tài khoản của tôi
+                    </Link>
+                    <Link
+                      to='/user/purchase'
+                      className='block px-4 py-2 hover:bg-gray-100 rounded font-medium'
+                    >
+                      Đơn Mua
+                    </Link>
+                    <div
+                      onClick={handleLogout}
+                      className='block px-4 py-2 hover:bg-gray-100 rounded font-medium cursor-pointer'
+                    >
+                      Đăng xuất
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className='flex items-center font-light text-white'>
+              <Link
+                to='/register'
+                className='hover:text-header-hover transition-colors pr-2 border-r border-white/30'
+              >
+                Đăng Ký
+              </Link>
+              <Link
+                to='/login'
+                className='hover:text-header-hover transition-colors pl-2'
+              >
+                Đăng Nhập
+              </Link>
+            </div>
           )}
         </nav>
       </div>
@@ -262,7 +293,8 @@ const Header = ({ navbarBelow = true }) => {
           <img
             src={Logo}
             alt='Logo'
-            className='text-[#fffeff] h-15 mr-12 md:h-20'
+            onClick={() => navigate('/')}
+            className='text-[#fffeff] h-15 mr-12 md:h-20 cursor-pointer'
           />
           <div className={`${isMobile ? 'flex-2' : 'flex-1'}`}>
             <SearchBar />
@@ -309,12 +341,12 @@ const Header = ({ navbarBelow = true }) => {
             <div className='relative flex-1 flex justify-center'>
               <div
                 className='flex items-center justify-center text-white hover:text-header-hover transition-colors duration-200 cursor-pointer'
-                onMouseEnter={() => setDropdownOpen('Kaito', true)}
-                onMouseLeave={() => setDropdownOpen('Kaito', false)}
+                onMouseEnter={() => setDropdownOpen('user-menu-mobile', true)}
+                onMouseLeave={() => setDropdownOpen('user-menu-mobile', false)}
               >
                 <User size={20} />
               </div>
-              {dropdownStates['Kaito'] && (
+              {user && dropdownStates['user-menu-mobile'] && (
                 <div
                   className='absolute right-0 mt-1 w-48 bg-white text-gray-900 shadow-lg z-50 rounded-lg'
                   onMouseEnter={() => setDropdownOpen('Kaito', true)}
@@ -326,32 +358,20 @@ const Header = ({ navbarBelow = true }) => {
                       to='/user/profile'
                       className='block px-4 py-2 hover:bg-gray-100 rounded font-medium'
                     >
-                      Thông tin cá nhân
+                      Tài khoản của tôi
                     </Link>
                     <Link
-                      to='/user/orders'
+                      to='/user/purchase'
                       className='block px-4 py-2 hover:bg-gray-100 rounded font-medium'
                     >
-                      Đơn hàng của tôi
+                      Đơn Mua
                     </Link>
-                    <Link
-                      to='/user/favorites'
-                      className='block px-4 py-2 hover:bg-gray-100 rounded font-medium'
-                    >
-                      Sản phẩm yêu thích
-                    </Link>
-                    <Link
-                      to='/user/settings'
-                      className='block px-4 py-2 hover:bg-gray-100 rounded font-medium'
-                    >
-                      Cài đặt tài khoản
-                    </Link>
-                    <Link
-                      to='/logout'
-                      className='block px-4 py-2 hover:bg-gray-100 rounded font-medium'
+                    <div
+                      onClick={handleLogout}
+                      className='block px-4 py-2 hover:bg-gray-100 rounded font-medium cursor-pointer'
                     >
                       Đăng xuất
-                    </Link>
+                    </div>
                   </div>
                 </div>
               )}

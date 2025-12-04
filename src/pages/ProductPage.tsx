@@ -35,6 +35,7 @@ interface DetailedReview extends Review {
   absorption: string
   likes: number
   hasMedia: boolean
+  averageRating: number
 }
 
 interface Recommended {
@@ -929,7 +930,8 @@ const ProductPage = () => {
                     Danh Mục
                   </span>
                   <span>
-                    Shopee &gt; Nhà Cửa & Đời Sống &gt; Cốc, Ly & Bình giữ nhiệt
+                    Online Shop &gt; Nhà Cửa & Đời Sống &gt; Cốc, Ly & Bình giữ
+                    nhiệt
                   </span>
                 </div>
                 <div className='flex'>
@@ -980,7 +982,7 @@ const ProductPage = () => {
           <div className='flex items-center gap-8 mb-6 p-6 bg-orange-50 rounded-lg'>
             <div className='text-center'>
               <div className='text-3xl font-bold text-orange-500 mb-2'>
-                {ReviewSummary.averageRating.toFixed(1)}/5
+                {ReviewSummary?.averageRating?.toFixed(1)}/5
               </div>
               <div className='flex justify-center mb-2'>
                 {[...Array(5)].map((_, i) => (

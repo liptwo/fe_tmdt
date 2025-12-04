@@ -140,7 +140,7 @@ export default function SearchPage() {
                           Yêu thích
                         </span>
                         <span className='bg-yellow-400 text-xs px-2 py-0.5 rounded'>
-                          Shopee Siêu Rẻ
+                          Online Shop Siêu Rẻ
                         </span>
                       </div>
                     </div>
