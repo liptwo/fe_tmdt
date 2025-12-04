@@ -12,6 +12,7 @@ import DeleteAcc from './pages/user/DeleteAcc'
 import SellAndChatApp from './pages/user/Sell'
 import FloatingChatBox from './components/ui/FloatingChatBox'
 import NotFound from './pages/not-found'
+import SearchPage from './pages/Search'
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
           <Route path='checkout' element={<Checkout />} />
           <Route path='*' element={<NotFound />} />
           <Route path='/channel/*' element={<SellAndChatApp />} />
+          <Route path='/search' element={<SearchPage />} />
           <Route path='*' element={<NotFound />} />
         </Route>
         <Route path='/checkout' element={<Checkout />} />
