@@ -71,11 +71,11 @@ const Header = ({ navbarBelow = true }) => {
   }
   return (
     <div
-      className='sticky top-0 z-50 flex-col justify-center py-2 px-1.5 md:py-1 md:px-4 md:10 lg:px-20 xl:px-40'
+      className='flex items-center justify-between w-full top-0 z-50 flex-col py-2 px-1.5 md:py-1 md:px-4 md:10 lg:px-20 xl:px-40'
       style={{ background: 'var(--header-background)' }}
     >
-      <div className=' justify-between text-[13px] p-1 hidden md:flex'>
-        <nav className='flex items-center '>
+      <div className='container items-center justify-between text-[13px] p-1 hidden md:flex'>
+        <nav className='flex items-center justify-between '>
           <div className='flex gap-3'>
             {navTopNavItemsLeft.map((item) => (
               <Link
@@ -255,13 +255,14 @@ const Header = ({ navbarBelow = true }) => {
           )}
         </nav>
       </div>
+
       {/* Navbar below */}
       {navbarBelow && (
-        <div className='flex items-center'>
+        <div className='container items-center justify-between flex'>
           <img
             src={Logo}
             alt='Logo'
-            className='text-[#fffeff] h-[5rem] mr-12 hidden md:block'
+            className='text-[#fffeff] h-15 mr-12 md:h-20'
           />
           <div className={`${isMobile ? 'flex-2' : 'flex-1'}`}>
             <SearchBar />
