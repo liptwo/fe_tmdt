@@ -647,6 +647,15 @@ const ProductPage = () => {
                     ))}
                   </div>
                 </div>
+                <Separator orientation='vertical' className='h-4' />
+                <div>
+                  <span className='font-bold underline'>{product.reviews.length}</span> Đánh Giá
+                </div>
+                <Separator orientation='vertical' className='h-4' />
+                <div>
+                  <span className='font-bold'>{!!product.sold && product.sold >= 1000 ? `${(product.sold / 1000).toFixed(1)}k` : (product.sold || 0)}</span> Đã Bán
+                </div>
+              </div>
 
               <div className='bg-gray-50 p-4 rounded-lg mb-6'>
                 <div className='flex items-baseline gap-4'>
