@@ -1,4 +1,4 @@
-const DEFAULT_API_BASE_URL = 'https://backend-ecommerce-e8b7.onrender.com/api'
+const DEFAULT_API_BASE_URL = '/api'
 
 export const API_BASE_URL =
   (import.meta.env.VITE_API_URL as string | undefined)?.replace(/\/$/, '') ??
@@ -18,12 +18,18 @@ class ApiError extends Error {
 
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   const url = `${API_BASE_URL}${path.startsWith('/') ? path : `/${path}`}`
+  const isFormData = init.body instanceof FormData
+  const headers = {
+    ...(init.headers ?? {})
+  } as Record<string, string>
+
+  if (!isFormData) {
+    headers['Content-Type'] = 'application/json'
+  }
+
   const response = await fetch(url, {
     ...init,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(init.headers ?? {})
-    }
+    headers
   })
 
   const text = await response.text()
@@ -75,6 +81,11 @@ export interface UserInfo {
   status: string
   createdAt: string
   updatedAt: string
+  address?: string
+  phone?: string
+  bankName?: string
+  bankAccountNumber?: string
+  bankAccountHolder?: string
 }
 
 export interface LoginPayload {
@@ -99,6 +110,8 @@ export interface Category {
   name: string
   description?: string
   status: string
+  image?: string
+  imageUrl?: string
   createdAt: string
   updatedAt: string
 }
@@ -119,7 +132,12 @@ export interface Product {
   name: string
   description?: string | null
   price: number
+  originalPrice?: number
   stock: number
+  sold?: number
+  rating?: number
+  location?: string
+  discount?: number
   images: string[]
   status: string
   categoryId: string
@@ -181,6 +199,14 @@ export const authApi = {
       headers: {
         Authorization: `Bearer ${token}`
       }
+    }),
+  updateProfile: (token: string, data: any) =>
+    request<UserInfo>('/auth/profile', {
+      method: 'PUT',
+      body: JSON.stringify(data),
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
     })
 }
 
@@ -191,7 +217,36 @@ export const categoriesApi = {
 export const productsApi = {
   list: (params?: ProductsQuery) =>
     request<ProductListResponse>(`/products${buildQueryString(params)}`),
-  getById: (id: string) => request<Product>(`/products/${id}`)
+  getById: (id: string) => request<Product>(`/products/${id}`),
+  create: (token: string, formData: FormData) =>
+    request<Product>('/products', {
+      method: 'POST',
+      body: formData,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }),
+  update: (token: string, id: string, formData: FormData) =>
+    request<Product>(`/products/${id}`, {
+      method: 'PATCH',
+      body: formData,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }),
+  delete: (token: string, id: string) =>
+    request<{ message: string }>(`/products/${id}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }),
+  listMyProducts: (token: string) =>
+    request<Product[]>('/products/seller/me', {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
 }
 
 export interface UpdateCartItemPayload {
@@ -237,8 +292,7 @@ export interface Order {
   updatedAt: string
 }
 
-export interface CreateOrderResponse {
-  order: Order
+export type CreateOrderResponse = Order & {
   paymentUrl?: string
 }
 
@@ -290,7 +344,7 @@ export const cartApi = {
 
 export const ordersApi = {
   create: (token: string, payload: CreateOrderPayload) =>
-    request<CreateOrderResponse>('/orders', {
+    request<CreateOrderResponse>('/orders/checkout', {
       method: 'POST',
       body: JSON.stringify(payload),
       headers: {
@@ -308,6 +362,29 @@ export const ordersApi = {
       headers: {
         Authorization: `Bearer ${token}`
       }
+    }),
+  cancel: (token: string, orderId: string) =>
+    request<Order>(`/orders/${orderId}/cancel`, {
+      method: 'PATCH',
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+}
+
+export const adminApi = {
+  getStats: (token: string) => request<any>('/admin/dashboard/stats', {
+    headers: { Authorization: `Bearer ${token}` }
+  }),
+  getUsers: (token: string, params?: { role?: string; status?: string }) =>
+    request<UserInfo[]>(`/admin/users${buildQueryString(params)}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    }),
+  updateUserStatus: (token: string, id: string, status: string) =>
+    request<UserInfo>(`/admin/users/${id}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status }),
+      headers: { Authorization: `Bearer ${token}` }
     })
 }
 

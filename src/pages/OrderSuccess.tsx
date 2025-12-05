@@ -1,83 +1,35 @@
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { CheckCircle, Package, Truck, MapPin, CreditCard } from 'lucide-react';
-// import { useAuth } from '@/context/auth-context'; // TODO: Uncomment when API ready
-// import { ordersApi } from '@/lib/api'; // TODO: Uncomment when API ready
+import { useAuth } from '@/context/auth-context';
+import { ordersApi } from '@/lib/api';
 import type { Order } from '@/lib/api';
 
 export default function OrderSuccess() {
   const [searchParams] = useSearchParams();
   const orderId = searchParams.get('orderId');
-  // const { token } = useAuth(); // TODO: Uncomment when API ready
+  const { token } = useAuth();
   const [order, setOrder] = useState<Order | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (!orderId) {
+    if (!orderId || !token) {
       setIsLoading(false);
       return;
     }
 
-    // TODO: Tích hợp API sau khi backend sẵn sàng
-    // const fetchOrder = async () => {
-    //   try {
-    //     const data = await ordersApi.getById(token, orderId);
-    //     setOrder(data);
-    //   } catch (error) {
-    //     console.error('[OrderSuccess] Failed to fetch order:', error);
-    //   } finally {
-    //     setIsLoading(false);
-    //   }
-    // };
-    // fetchOrder();
-
-    // Mock order data for testing UI
-    const mockOrder: Order = {
-      id: orderId,
-      userId: 'user-123',
-      orderNumber: orderId,
-      status: 'PENDING',
-      totalAmount: '500000',
-      shippingAddress: {
-        fullName: 'Nguyễn Văn A',
-        phoneNumber: '0912345678',
-        address: '123 Đường ABC',
-        city: 'TP. Hồ Chí Minh',
-        district: 'Quận 1',
-        ward: 'Phường Bến Nghé'
-      },
-      paymentMethod: 'COD',
-      paymentStatus: 'PENDING',
-      note: '',
-      items: [
-        {
-          id: 'item-1',
-          orderId: orderId,
-          productId: 'product-1',
-          quantity: 2,
-          unitPrice: '250000',
-          product: {
-            id: 'product-1',
-            name: 'Sản phẩm demo',
-            description: 'Mô tả sản phẩm',
-            price: 250000,
-            stock: 100,
-            images: [],
-            status: 'ACTIVE',
-            categoryId: 'cat-1',
-            sellerId: 'seller-1',
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-          }
-        }
-      ],
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+    const fetchOrder = async () => {
+      try {
+        const data = await ordersApi.getById(token, orderId);
+        setOrder(data);
+      } catch (error) {
+        console.error('[OrderSuccess] Failed to fetch order:', error);
+      } finally {
+        setIsLoading(false);
+      }
     };
-
-    setOrder(mockOrder);
-    setIsLoading(false);
-  }, [orderId]);
+    fetchOrder();
+  }, [orderId, token]);
 
   if (isLoading) {
     return (
@@ -140,17 +92,17 @@ export default function OrderSuccess() {
 
   const getOrderStatusLabel = (status: string) => {
     switch (status) {
-      case 'PENDING':
+      case 'pending':
         return 'Chờ xác nhận';
-      case 'CONFIRMED':
+      case 'confirmed':
         return 'Đã xác nhận';
-      case 'PROCESSING':
+      case 'processing':
         return 'Đang xử lý';
-      case 'SHIPPING':
+      case 'shipping':
         return 'Đang giao hàng';
-      case 'DELIVERED':
+      case 'delivered':
         return 'Đã giao';
-      case 'CANCELLED':
+      case 'cancelled':
         return 'Đã hủy';
       default:
         return status;

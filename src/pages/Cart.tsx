@@ -5,6 +5,7 @@ import { useAuth } from '@/context/auth-context'
 import { useCart } from '@/context/cart-context'
 import { cartApi } from '@/lib/api'
 import type { CartItem } from '@/lib/api'
+import { toast } from 'sonner'
 
 export default function Cart() {
   const { user, token } = useAuth()
@@ -28,7 +29,7 @@ export default function Cart() {
       await refreshCart()
     } catch (error) {
       console.error('[Cart] Failed to update quantity:', error)
-      alert('Không thể cập nhật số lượng. Vui lòng thử lại.')
+      toast.error('Không thể cập nhật số lượng. Vui lòng thử lại.')
     } finally {
       setUpdatingItems((prev) => {
         const next = new Set(prev)
@@ -47,7 +48,7 @@ export default function Cart() {
       await refreshCart()
     } catch (error) {
       console.error('[Cart] Failed to remove item:', error)
-      alert('Không thể xóa sản phẩm. Vui lòng thử lại.')
+      toast.error('Không thể xóa sản phẩm. Vui lòng thử lại.')
     } finally {
       setRemovingItems((prev) => {
         const next = new Set(prev)

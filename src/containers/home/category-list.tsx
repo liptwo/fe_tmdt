@@ -16,218 +16,7 @@ type CategoryDisplay = {
   href: string
 }
 
-const FALLBACK_CATEGORIES: CategoryDisplay[] = [
-  {
-    name: 'Thời Trang Nam',
-    image: '/src/assets/image/category/thoi-trang-nam.png',
-    href: '/thoi-trang-nam',
-    id: 1
-  },
-  {
-    name: 'Điện Thoại & Phụ Kiện',
-    image: '/src/assets/image/category/dien-thoai-va-phu-kien.png',
-    href: '/dien-thoai-phu-kien',
-    id: 2
-  },
-  {
-    name: 'Thiết Bị Điện Tử',
-    image: '/src/assets/image/category/thiet-bi-dien-tu.png',
-    href: '/thiet-bi-dien-tu',
-    id: 3
-  },
-  {
-    name: 'Máy Tính & Laptop',
-    image: '/src/assets/image/category/may-tinh-va-laptop.png',
-    href: '/may-tinh-laptop',
-    id: 4
-  },
-  {
-    name: 'Máy Ảnh & Máy Quay Phim',
-    image: '/src/assets/image/category/may-anh-va-may-quay-phim.png',
-    href: '/may-anh-may-quay-phim',
-    id: 5
-  },
-  {
-    name: 'Đồng Hồ',
-    image: '/src/assets/image/category/dong-ho.png',
-    href: '/dong-ho',
-    id: 6
-  },
-  {
-    name: 'Giày Dép Nam',
-    image: '/src/assets/image/category/giay-dep-nam.png',
-    href: '/giay-dep-nam',
-    id: 7
-  },
-  {
-    name: 'Thiết Bị Điện Gia Dụng',
-    image: '/src/assets/image/category/thiet-bi-dien-gia-dung.png',
-    href: '/thiet-bi-dien-gia-dung',
-    id: 8
-  },
-  {
-    name: 'Thể Thao & Du Lịch',
-    image: '/src/assets/image/category/the-thao-va-du-lich.png',
-    href: '/the-thao-du-lich',
-    id: 9
-  },
-  {
-    name: 'Ô Tô & Xe Máy & Xe Đạp',
-    image: '/src/assets/image/category/o-to-va-xe-may-va-xe-dap.png',
-    href: '/o-to-xe-may-xe-dap',
-    id: 10
-  },
-  {
-    name: 'Balo & Túi Ví Nam',
-    image: '/src/assets/image/category/balo-va-tui-vi-nam.png',
-    href: '/balo-tui-vi-nam',
-    id: 11
-  },
-  {
-    name: 'Thời Trang Nữ',
-    image: '/src/assets/image/category/thoi-trang-nu.png',
-    href: '/thoi-trang-nu',
-    id: 12
-  },
-  {
-    name: 'Mẹ & Bé',
-    image: '/src/assets/image/category/me-va-be.png',
-    href: '/me-va-be',
-    id: 13
-  },
-  {
-    name: 'Nhà Cửa & Đời Sống',
-    image: '/src/assets/image/category/nha-cua-va-doi-song.png',
-    href: '/nha-cua-doi-song',
-    id: 14
-  },
-  {
-    name: 'Sắc Đẹp',
-    image: '/src/assets/image/category/sac-dep.png',
-    href: '/sac-dep',
-    id: 15
-  },
-  {
-    name: 'Sức Khỏe',
-    image: '/src/assets/image/category/suc-khoe.png',
-    href: '/suc-khoe',
-    id: 16
-  },
-  {
-    name: 'Giày Dép Nữ',
-    image: '/src/assets/image/category/giay-dep-nu.png',
-    href: '/giay-dep-nu',
-    id: 17
-  },
-  {
-    name: 'Phụ Kiện & Trang Sức Nữ',
-    image: '/src/assets/image/category/phu-kien-va-trang-suc-nu.png',
-    href: '/phu-kien-va-trang-suc-nu',
-    id: 18
-  },
-  {
-    name: 'Bách Hóa Online',
-    image: '/src/assets/image/category/bach-hoa-online.png',
-    href: '/bach-hoa-online',
-    id: 19
-  },
-  {
-    name: 'Nhà Sách Online',
-    image: '/src/assets/image/category/nha-sach-online.png',
-    href: '/nha-sach-online',
-    id: 20
-  },
-  {
-    name: 'Đồ Chơi',
-    image: '/src/assets/image/category/do-choi.png',
-    href: '/do-choi',
-    id: 21
-  },
-  {
-    name: 'Chăm Sóc Thú Cưng',
-    image: '/src/assets/image/category/cham-soc-thu-cung.png',
-    href: '/cham-soc-thu-cung',
-    id: 22
-  },
-  {
-    name: 'Dụng cụ và thiết bị tiện ích',
-    image: '/src/assets/image/category/dung-cu-va-thiet-bi-tien-ich.png',
-    href: '/dung-cu-thiet-bi-tien-ich',
-    id: 23
-  },
-  {
-    name: 'Thời Trang Trẻ Em',
-    image: '/src/assets/image/category/thoi-trang-tre-em.png',
-    href: '/thoi-trang-tre-em',
-    id: 24
-  },
-  {
-    name: 'Giặt Giũ & Chăm Sóc Nhà Cửa',
-    image: '/src/assets/image/category/giat-giu-va-cham-soc-nha-cua.png',
-    href: '/giat-giu-cham-soc-nha-cua',
-    id: 25
-  },
-  {
-    name: 'Voucher & Dịch Vụ',
-    image: '/src/assets/image/category/voucher-va-dich-vu.png',
-    href: '/voucher-dich-vu',
-    id: 26
-  },
-  {
-    name: 'Nhà Sách Online',
-    image: '/src/assets/image/category/nha-sach-online.png',
-    href: '/nha-sach-online',
-    id: 27
-  },
-  {
-    name: 'Đồ Chơi',
-    image: '/src/assets/image/category/do-choi.png',
-    href: '/do-choi',
-    id: 28
-  },
-  {
-    name: 'Chăm Sóc Thú Cưng',
-    image: '/src/assets/image/category/cham-soc-thu-cung.png',
-    href: '/cham-soc-thu-cung',
-    id: 29
-  },
-  {
-    name: 'Dụng cụ và thiết bị tiện ích',
-    image: '/src/assets/image/category/dung-cu-va-thiet-bi-tien-ich.png',
-    href: '/dung-cu-thiet-bi-tien-ich',
-    id: 30
-  },
-  {
-    name: 'Thời Trang Trẻ Em',
-    image: '/src/assets/image/category/thoi-trang-tre-em.png',
-    href: '/thoi-trang-tre-em',
-    id: 31
-  },
-  {
-    name: 'Giặt Giũ & Chăm Sóc Nhà Cửa',
-    image: '/src/assets/image/category/giat-giu-va-cham-soc-nha-cua.png',
-    href: '/giat-giu-cham-soc-nha-cua',
-    id: 32
-  },
-  {
-    name: 'Voucher & Dịch Vụ',
-    image: '/src/assets/image/category/voucher-va-dich-vu.png',
-    href: '/voucher-dich-vu',
-    id: 33
-  },
-  {
-    name: 'Nhà Sách Online',
-    image: '/src/assets/image/category/nha-sach-online.png',
-    href: '/nha-sach-online',
-    id: 34
-  },
-  {
-    name: 'Đồ Chơi',
-    image: '/src/assets/image/category/do-choi.png',
-    href: '/do-choi',
-    id: 35
-  }
-]
+
 
 const CategoryList = () => {
   const [dynamicCategories, setDynamicCategories] = useState<CategoryDisplay[]>(
@@ -245,15 +34,11 @@ const CategoryList = () => {
           (category) => category.status === 'active'
         )
         if (activeCategories.length === 0) return
-        const mapped = activeCategories.map((category, index) => {
-          const fallback =
-            FALLBACK_CATEGORIES[index % FALLBACK_CATEGORIES.length]
+        const mapped = activeCategories.map((category) => {
           return {
             id: category.id,
             name: category.name,
-            image:
-              fallback?.image ??
-              '/src/assets/image/category/thoi-trang-nam.png',
+            image: category.imageUrl || category.image || '/src/assets/image/category/thoi-trang-nam.png',
             href: `/search?category=${category.id}`
           }
         })
@@ -272,12 +57,7 @@ const CategoryList = () => {
     }
   }, [])
 
-  const categories = useMemo(() => {
-    if (dynamicCategories.length > 0) {
-      return dynamicCategories
-    }
-    return FALLBACK_CATEGORIES
-  }, [dynamicCategories])
+  const categories = useMemo(() => dynamicCategories, [dynamicCategories])
 
   // Chunk categories into pages of 20 (2 rows x 10 items)
   const pageSize = 20

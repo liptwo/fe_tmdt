@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { toast } from "sonner";
 
 const Bank = () => {
     const [showCard, setShowCard] = useState(false);
     const [step, setStep] = useState(1);
-    const [banks, setBanks] = useState([]);
+    const [banks, setBanks] = useState<any[]>([]);
     const [selectedBank, setSelectedBank] = useState("");
     const [branch, setBranch] = useState("");
     const [accountNumber, setAccountNumber] = useState("");
     const [fullName, setFullName] = useState("");
-    const [bankAccounts, setBankAccounts] = useState([]); // ✅ Lưu danh sách ngân hàng đã thêm
-    const navigate = useNavigate();
+    const [bankAccounts, setBankAccounts] = useState<any[]>([]); // ✅ Lưu danh sách ngân hàng đã thêm
+
 
     // Gọi API để lấy danh sách ngân hàng (logo, tên)
     useEffect(() => {
@@ -22,12 +22,12 @@ const Bank = () => {
         }
     }, [step]);
 
-    const handleSubmitStep1 = (e) => {
+    const handleSubmitStep1 = (e: React.FormEvent) => {
         e.preventDefault();
         setStep(2);
     };
 
-    const handleSubmitStep2 = (e) => {
+    const handleSubmitStep2 = (e: React.FormEvent) => {
         e.preventDefault();
 
         // Thêm ngân hàng vào danh sách
@@ -43,7 +43,7 @@ const Bank = () => {
             },
         ]);
 
-        alert("Thêm tài khoản ngân hàng thành công!");
+        toast.success("Thêm tài khoản ngân hàng thành công!");
         setShowCard(false);
         setStep(1);
     };

@@ -3,8 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { ShoppingBag, MapPin, CreditCard, Truck, Check, X, QrCode } from 'lucide-react';
 import { useAuth } from '@/context/auth-context';
 import { useCart } from '@/context/cart-context';
-// import { ordersApi } from '@/lib/api'; // TODO: Uncomment when API ready
+import { ordersApi } from '@/lib/api';
 import type { ShippingAddress } from '@/lib/api';
+
+import { toast } from 'sonner';
 
 // Import QR code image - Bạn có thể thay đổi đường dẫn này
 import vnpayQR from '@/assets/payment/pay1.png'; // Thay bằng QR code VNPAY của bạn
@@ -42,6 +44,20 @@ export function Checkout() {
     }
   }, [user, cart, navigate]);
 
+  // 🟢 Load saved profile data from localStorage to auto-populate shipping address
+  useEffect(() => {
+    const savedProfile = JSON.parse(localStorage.getItem('profileData') || '{}');
+    
+    setShippingAddress({
+      fullName: user?.fullName || savedProfile.name || '',
+      phoneNumber: savedProfile.phone || '',
+      address: savedProfile.address || '',
+      city: savedProfile.city || '',
+      district: savedProfile.district || '',
+      ward: savedProfile.ward || ''
+    });
+  }, [user]);
+
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
@@ -68,13 +84,13 @@ export function Checkout() {
     e.preventDefault();
 
     if (!token) {
-      alert('Vui lòng đăng nhập để đặt hàng');
+      toast.error('Vui lòng đăng nhập để đặt hàng');
       navigate('/login');
       return;
     }
 
     if (!cart || cart.items.length === 0) {
-      alert('Giỏ hàng trống. Vui lòng thêm sản phẩm vào giỏ hàng');
+      toast.error('Giỏ hàng trống. Vui lòng thêm sản phẩm vào giỏ hàng');
       navigate('/cart');
       return;
     }
@@ -97,25 +113,29 @@ export function Checkout() {
         note: note.trim() || undefined
       });
 
-      // TODO: Tích hợp API sau khi backend sẵn sàng
-      // const response = await ordersApi.create(token, {
-      //   shippingAddress,
-      //   paymentMethod,
-      //   note: note.trim() || undefined
-      // });
+      // Call real API
+      const response = await ordersApi.create(token, {
+        shippingAddress,
+        paymentMethod,
+        note: note.trim() || undefined
+      });
 
-      // Mock response for testing UI
-      const mockOrderId = `ORDER-${Date.now()}`;
-      console.log('[Checkout] Order created successfully (MOCK):', mockOrderId);
+      console.log('[Checkout] Order created successfully:', response);
 
       // Clear cart after successful order
       await refreshCart();
 
       // Show success message
-      alert('✅ Đặt hàng thành công!');
+      toast.success('✅ Đặt hàng thành công!');
 
-      // Navigate to success page with mock order ID
-      navigate(`/order-success?orderId=${mockOrderId}`);
+      // Navigate to success page with real order ID
+      const orderId = response.id;
+      
+      if (response.paymentUrl) {
+          // Handle payment URL if needed in future
+      }
+
+      navigate(`/order-success?orderId=${orderId}`);
     } catch (error: any) {
       console.error('[Checkout] Failed to create order:', error);
       console.error('[Checkout] Error details:', {
@@ -126,7 +146,7 @@ export function Checkout() {
       
       // Show detailed error message
       const errorMessage = error?.message || error?.details?.message || 'Không thể tạo đơn hàng. Vui lòng thử lại.';
-      alert(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
     }

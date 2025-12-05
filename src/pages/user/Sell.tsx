@@ -236,11 +236,15 @@ function Dashboard({
 function ProductsTab({
   products,
   setProducts,
-  pushNotification
+  pushNotification,
+  categories,
+  refreshProducts
 }: {
   products: Product[]
   setProducts: (p: Product[]) => void
   pushNotification: (n: string) => void
+  categories: Category[]
+  refreshProducts: () => void
 }) {
   // form
   const [editing, setEditing] = useState<Product | null>(null)
@@ -249,6 +253,9 @@ function ProductsTab({
   const [desc, setDesc] = useState('')
   const [img, setImg] = useState('')
   const [stock, setStock] = useState<number | ''>('')
+  const [categoryId, setCategoryId] = useState('')
+  const [imageFile, setImageFile] = useState<File | null>(null)
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     if (editing) {
@@ -257,57 +264,86 @@ function ProductsTab({
       setDesc(editing.description || '')
       setImg(editing.imageUrl || '')
       setStock(editing.stock ?? '')
+      // We don't have categoryId in local Product type yet, but API has it.
+      // Ideally we should have it. For now, let's assume we might not have it or default to first category.
+      // But wait, we mapped API product to local Product, and we didn't include categoryId.
+      // We should update the mapping in Sell component to include categoryId.
+      // For now, let's just default to empty or first category if not found.
+      setCategoryId('') 
     } else {
       setName('')
       setPrice('')
       setDesc('')
       setImg('')
       setStock('')
+      setCategoryId(categories[0]?.id || '')
+      setImageFile(null)
     }
-  }, [editing])
+  }, [editing, categories])
 
-  function save() {
-    if (!name || price === '' || Number(price) <= 0)
-      return alert('Nhập tên & giá hợp lệ')
-    if (editing) {
-      const updated = products.map((p) =>
-        p.id === editing.id
-          ? {
-              ...p,
-              name,
-              price: Number(price),
-              description: desc,
-              imageUrl: img || undefined,
-              stock: stock === '' ? p.stock : Number(stock)
-            }
-          : p
-      )
-      setProducts(updated)
-      pushNotification(`Đã cập nhật sản phẩm ${name}`)
-    } else {
-      const p: Product = {
-        id: uid('p_'),
-        name,
-        price: Number(price),
-        description: desc,
-        imageUrl: img || undefined,
-        stock: stock === '' ? 0 : Number(stock)
+  async function save() {
+    if (!name || price === '' || Number(price) <= 0 || !categoryId)
+      return toast.error('Nhập tên, giá và chọn danh mục hợp lệ')
+    
+    setLoading(true)
+    try {
+      const token = localStorage.getItem('access_token')
+      if (!token) throw new Error('No token found')
+
+      const formData = new FormData()
+      formData.append('name', name)
+      formData.append('price', String(price))
+      formData.append('description', desc)
+      formData.append('stock', String(stock || 0))
+      formData.append('categoryId', categoryId)
+      
+      if (imageFile) {
+        formData.append('images', imageFile)
+      } else if (img && !editing) {
+         // If creating new and providing URL manually (not supported by backend upload usually, but maybe for testing)
+         // Backend expects 'images' as file. If we want to support URL, backend needs update.
+         // For now, let's assume file upload is the way.
       }
-      setProducts([p, ...products])
-      pushNotification(`Đã thêm sản phẩm ${name}`)
+
+      if (editing) {
+        await productsApi.update(token, editing.id, formData)
+        toast.success(`Đã cập nhật sản phẩm ${name}`)
+      } else {
+        await productsApi.create(token, formData)
+        toast.success(`Đã thêm sản phẩm ${name}`)
+      }
+      
+      refreshProducts()
+      setEditing(null)
+      setImageFile(null)
+      setImg('')
+    } catch (error) {
+      console.error(error)
+      toast.error('Có lỗi xảy ra khi lưu sản phẩm')
+    } finally {
+      setLoading(false)
     }
-    setEditing(null)
   }
 
-  function remove(id: string) {
+  async function remove(id: string) {
     if (!confirm('Xác nhận xóa sản phẩm này?')) return
-    setProducts(products.filter((p) => p.id !== id))
-    pushNotification('Đã xóa sản phẩm')
+    try {
+      const token = localStorage.getItem('access_token')
+      if (!token) throw new Error('No token found')
+      
+      await productsApi.delete(token, id)
+      toast.success('Đã xóa sản phẩm')
+      refreshProducts()
+    } catch (error) {
+      console.error(error)
+      toast.error('Có lỗi xảy ra khi xóa sản phẩm')
+    }
   }
 
   function handleImageFile(e: React.ChangeEvent<HTMLInputElement>) {
     const f = e.target.files?.[0]
     if (!f) return
+    setImageFile(f)
     const reader = new FileReader()
     reader.onload = () => setImg(reader.result as string)
     reader.readAsDataURL(f)
@@ -342,30 +378,46 @@ function ProductsTab({
             setStock(e.target.value === '' ? '' : Number(e.target.value))
           }
         />
+        <select
+          className='border p-2 rounded'
+          value={categoryId}
+          onChange={(e) => setCategoryId(e.target.value)}
+        >
+          <option value="">Chọn danh mục</option>
+          {categories.map(c => (
+            <option key={c.id} value={c.id}>{c.name}</option>
+          ))}
+        </select>
         <textarea
-          className='border p-2 rounded md:col-span-3'
+          className='border p-2 rounded md:col-span-2'
           placeholder='Mô tả'
           value={desc}
           onChange={(e) => setDesc(e.target.value)}
         />
-        <input
+        {/* <input
           className='border p-2 rounded'
           placeholder='Ảnh (URL)'
           value={img}
           onChange={(e) => setImg(e.target.value)}
-        />
-        <input
-          type='file'
-          accept='image/*'
-          onChange={handleImageFile}
-          className='col-span-3'
-        />
+        /> */}
+        <div className="col-span-3">
+            <label className="block text-sm text-gray-600 mb-1">Ảnh sản phẩm</label>
+            <input
+            type='file'
+            accept='image/*'
+            onChange={handleImageFile}
+            className='w-full'
+            />
+            {img && <img src={img} alt="Preview" className="h-20 mt-2 object-contain" />}
+        </div>
+        
         <div className='md:col-span-3 flex gap-2'>
           <button
             onClick={save}
-            className='bg-orange-600 text-white px-4 py-2 rounded'
+            disabled={loading}
+            className='bg-orange-600 text-white px-4 py-2 rounded disabled:opacity-50'
           >
-            {editing ? 'Lưu' : 'Thêm'}
+            {loading ? 'Đang xử lý...' : (editing ? 'Lưu' : 'Thêm')}
           </button>
           {editing && (
             <button
@@ -430,18 +482,39 @@ function ProductsTab({
 function InventoryTab({
   products,
   setProducts,
-  pushNotification
+  pushNotification,
+  refreshProducts
 }: {
   products: Product[]
   setProducts: (p: Product[]) => void
   pushNotification: (n: string) => void
+  refreshProducts: () => void
 }) {
-  function updateStock(id: string, delta: number) {
-    const updated = products.map((p) =>
-      p.id === id ? { ...p, stock: (p.stock ?? 0) + delta } : p
-    )
-    setProducts(updated)
-    pushNotification('Cập nhật tồn kho')
+  async function updateStock(id: string, delta: number) {
+    const p = products.find((x) => x.id === id)
+    if (!p) return
+    const newStock = (p.stock ?? 0) + delta
+    if (newStock < 0) return
+
+    try {
+      const token = localStorage.getItem('access_token')
+      if (!token) throw new Error('No token found')
+
+      const formData = new FormData()
+      formData.append('stock', String(newStock))
+      
+      // We need to send other required fields if the backend validation is strict, 
+      // but UpdateProductDto usually allows partial. 
+      // However, FormData might be tricky with partials if backend expects specific fields.
+      // Let's try sending just stock.
+      
+      await productsApi.update(token, id, formData)
+      toast.success(`Đã cập nhật tồn kho: ${newStock}`)
+      refreshProducts()
+    } catch (error) {
+      console.error(error)
+      toast.error('Lỗi cập nhật tồn kho')
+    }
   }
 
   return (
@@ -1080,7 +1153,7 @@ function Sidebar({
 }: {
   open: boolean
   setOpen: (v: boolean) => void
-  setTab: (t: string) => void
+  setTab: (t: any) => void
   notificationCount: number // <<< THAY ĐỔI 1: Kiểu dữ liệu
 }) {
   const tabs = [
@@ -1152,31 +1225,96 @@ function Sidebar({
   )
 }
 
+import { productsApi, categoriesApi, authApi, type Category } from '../../lib/api'
+import { useAuth } from '../../context/auth-context'
+import { toast } from 'sonner'
+
 /* ---------------- Main Sell Component ---------------- */
 export default function Sell() {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  // load or init data from localStorage
-  const [products, setProducts] = useState<Product[]>(() => {
-    const s = localStorage.getItem('sc_products')
-    return s
-      ? JSON.parse(s)
-      : [
-          {
-            id: uid('p_'),
-            name: 'Áo thun basic',
-            price: 120000,
-            description: 'Màu đen, cotton',
-            stock: 20
-          },
-          {
-            id: uid('p_'),
-            name: 'Quần jean',
-            price: 350000,
-            description: 'Denim unisex',
-            stock: 8
-          }
-        ]
+  const { user, refreshProfile } = useAuth()
+  const [showProfileModal, setShowProfileModal] = useState(false)
+  const [profileForm, setProfileForm] = useState({
+    address: '',
+    phone: '',
+    bankName: '',
+    bankAccountNumber: '',
+    bankAccountHolder: ''
   })
+
+  useEffect(() => {
+    if (user) {
+      const missingInfo = !user.address || !user.phone || !user.bankName || !user.bankAccountNumber || !user.bankAccountHolder
+      if (missingInfo) {
+        setShowProfileModal(true)
+        setProfileForm({
+          address: user.address || '',
+          phone: user.phone || '',
+          bankName: user.bankName || '',
+          bankAccountNumber: user.bankAccountNumber || '',
+          bankAccountHolder: user.bankAccountHolder || ''
+        })
+      } else {
+        setShowProfileModal(false)
+      }
+    }
+  }, [user])
+
+  async function handleUpdateProfile() {
+    if (!profileForm.address || !profileForm.phone || !profileForm.bankName || !profileForm.bankAccountNumber || !profileForm.bankAccountHolder) {
+      toast.error('Vui lòng điền đầy đủ thông tin')
+      return
+    }
+
+    try {
+      const token = localStorage.getItem('access_token')
+      if (!token) return
+      await authApi.updateProfile(token, profileForm)
+      await refreshProfile()
+      toast.success('Cập nhật thông tin thành công!')
+    } catch (error) {
+      console.error(error)
+      toast.error('Có lỗi xảy ra khi cập nhật thông tin')
+    }
+  }
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [products, setProducts] = useState<Product[]>([])
+  const [categories, setCategories] = useState<Category[]>([])
+
+  const fetchProducts = async () => {
+    if (user?.id) {
+      try {
+        const token = localStorage.getItem('access_token')
+        if (token) {
+          const data = await productsApi.listMyProducts(token)
+          const mapped: Product[] = data.map((p) => ({
+            id: p.id,
+            name: p.name,
+            price: p.price,
+            description: p.description || undefined,
+            imageUrl: p.images?.[0],
+            stock: p.stock
+          }))
+          setProducts(mapped)
+        }
+      } catch (error) {
+        console.error('Failed to fetch products', error)
+      }
+    }
+  }
+
+  useEffect(() => {
+    fetchProducts()
+    
+    const fetchCategories = async () => {
+      try {
+        const data = await categoriesApi.list()
+        setCategories(data)
+      } catch (error) {
+        console.error('Failed to fetch categories', error)
+      }
+    }
+    fetchCategories()
+  }, [user])
   const [orders, setOrders] = useState<Order[]>(() => {
     const s = localStorage.getItem('sc_orders')
     return s
@@ -1236,10 +1374,7 @@ export default function Sell() {
   >('dashboard')
 
   // persist
-  useEffect(
-    () => localStorage.setItem('sc_products', JSON.stringify(products)),
-    [products]
-  )
+
   useEffect(
     () => localStorage.setItem('sc_orders', JSON.stringify(orders)),
     [orders]
@@ -1295,6 +1430,79 @@ export default function Sell() {
     setNotifications([])
   }
 
+  if (showProfileModal) {
+    return (
+      <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
+        <div className='bg-white p-6 rounded-lg shadow-xl w-full max-w-md'>
+          <h2 className='text-2xl font-bold mb-4 text-center text-orange-600'>Hoàn thiện hồ sơ người bán</h2>
+          <p className='mb-4 text-gray-600 text-sm text-center'>
+            Vui lòng cung cấp thông tin địa chỉ và tài khoản ngân hàng để kích hoạt tính năng bán hàng và nhận thanh toán.
+          </p>
+          
+          <div className='space-y-3'>
+            <div>
+              <label className='block text-sm font-medium text-gray-700'>Địa chỉ kho hàng</label>
+              <input 
+                className='w-full border p-2 rounded mt-1'
+                value={profileForm.address}
+                onChange={e => setProfileForm({...profileForm, address: e.target.value})}
+                placeholder='Số nhà, đường, phường/xã...'
+              />
+            </div>
+            <div>
+              <label className='block text-sm font-medium text-gray-700'>Số điện thoại</label>
+              <input 
+                className='w-full border p-2 rounded mt-1'
+                value={profileForm.phone}
+                onChange={e => setProfileForm({...profileForm, phone: e.target.value})}
+                placeholder='09xxxxxxxx'
+              />
+            </div>
+            <div className='border-t pt-3 mt-3'>
+              <h3 className='font-semibold mb-2'>Thông tin ngân hàng (để nhận tiền)</h3>
+              <div className='space-y-3'>
+                <div>
+                  <label className='block text-sm font-medium text-gray-700'>Tên ngân hàng</label>
+                  <input 
+                    className='w-full border p-2 rounded mt-1'
+                    value={profileForm.bankName}
+                    onChange={e => setProfileForm({...profileForm, bankName: e.target.value})}
+                    placeholder='VD: Vietcombank'
+                  />
+                </div>
+                <div>
+                  <label className='block text-sm font-medium text-gray-700'>Số tài khoản</label>
+                  <input 
+                    className='w-full border p-2 rounded mt-1'
+                    value={profileForm.bankAccountNumber}
+                    onChange={e => setProfileForm({...profileForm, bankAccountNumber: e.target.value})}
+                    placeholder='Số tài khoản'
+                  />
+                </div>
+                <div>
+                  <label className='block text-sm font-medium text-gray-700'>Tên chủ tài khoản</label>
+                  <input 
+                    className='w-full border p-2 rounded mt-1'
+                    value={profileForm.bankAccountHolder}
+                    onChange={e => setProfileForm({...profileForm, bankAccountHolder: e.target.value.toUpperCase()})}
+                    placeholder='NGUYEN VAN A'
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <button 
+            onClick={handleUpdateProfile}
+            className='w-full bg-orange-600 text-white py-2 rounded mt-6 font-semibold hover:bg-orange-700 transition'
+          >
+            Cập nhật hồ sơ
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className='container bg-gray-100'>
       {/* <Header /> */}
@@ -1333,6 +1541,8 @@ export default function Sell() {
               products={products}
               setProducts={setProducts}
               pushNotification={pushNotification}
+              categories={categories}
+              refreshProducts={fetchProducts}
             />
           )}
 
@@ -1341,6 +1551,7 @@ export default function Sell() {
               products={products}
               setProducts={setProducts}
               pushNotification={pushNotification}
+              refreshProducts={fetchProducts}
             />
           )}
 

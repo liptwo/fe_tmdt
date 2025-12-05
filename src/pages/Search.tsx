@@ -1,28 +1,39 @@
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { productsApi, type Product } from '../lib/api'
-import { getMockProducts } from '../lib/mockProducts'
 
 export default function SearchPage() {
-  const [searchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
   const categoryId = searchParams.get('category')
   const searchQuery = searchParams.get('q')
+  const pageParam = searchParams.get('page')
 
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [totalPages, setTotalPages] = useState(1)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [totalResults, setTotalResults] = useState(0)
+
+  useEffect(() => {
+    const page = pageParam ? parseInt(pageParam) : 1
+    setCurrentPage(page)
+  }, [pageParam])
 
   useEffect(() => {
     const fetchProducts = async () => {
-      // setLoading(true)
+      setLoading(true)
       setError(null)
       try {
-        // use mock data during development
-        const response = await getMockProducts({
+        const response = await productsApi.list({
           categoryId: categoryId || undefined,
-          search: searchQuery || undefined
+          search: searchQuery || undefined,
+          limit: 20,
+          page: currentPage
         })
         setProducts(response.products)
+        setTotalPages(response.pagination.totalPages)
+        setTotalResults(response.pagination.total)
       } catch (err) {
         setError('Failed to fetch products.')
         console.error(err)
@@ -32,7 +43,16 @@ export default function SearchPage() {
     }
 
     fetchProducts()
-  }, [categoryId, searchQuery])
+  }, [categoryId, searchQuery, currentPage])
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage < 1 || newPage > totalPages) return
+    setSearchParams(prev => {
+      prev.set('page', newPage.toString())
+      return prev
+    })
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 
   const formatPrice = (p?: number) =>
     p != null ? p.toLocaleString('vi-VN') + '₫' : ''
@@ -106,86 +126,122 @@ export default function SearchPage() {
                 <button className='px-3 py-2 text-sm'>Giá</button>
               </div>
 
-              <div className='text-sm text-gray-500'>1/17</div>
+              <div className='text-sm text-gray-500'>
+                {currentPage}/{totalPages}
+              </div>
             </div>
           </div>
 
           {/* Results */}
           {loading ? (
-            <p>Loading...</p>
+            <p className="text-center py-10 text-gray-500">Đang tải sản phẩm...</p>
           ) : error ? (
-            <p className='text-red-500'>{error}</p>
+            <p className='text-red-500 text-center py-10'>{error}</p>
           ) : (
             <>
               <p className='mb-4 text-sm text-gray-700'>
-                Found {products.length} results for your search.
+                Tìm thấy {totalResults} kết quả.
               </p>
 
-              <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4'>
-                {products.map((product) => (
-                  <Link
-                    to={`/product?id=${product.id}`}
-                    key={product.id}
-                    className='bg-white border rounded overflow-hidden shadow hover:shadow-lg transition'
-                  >
-                    <div className='relative'>
-                      <img
-                        src={product.images?.[0] || '/placeholder.png'}
-                        alt={product.name}
-                        className='w-full h-40 object-cover'
-                      />
-                      {/* Badges */}
-                      <div className='absolute left-2 top-2 flex flex-col gap-1'>
-                        <span className='bg-orange-500 text-white text-xs px-2 py-0.5 rounded'>
-                          Yêu thích
-                        </span>
-                        <span className='bg-yellow-400 text-xs px-2 py-0.5 rounded'>
-                          Online Shop Siêu Rẻ
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className='p-3'>
-                      <h2 className='text-sm font-semibold truncate mb-1'>
-                        {product.name}
-                      </h2>
-                      <div className='text-xs text-gray-500 mb-2 truncate'>
-                        {product.category?.name}
+              {products.length === 0 ? (
+                <div className="text-center py-20 bg-white rounded border">
+                  <p className="text-gray-500 text-lg">Không tìm thấy sản phẩm nào phù hợp.</p>
+                  <p className="text-gray-400 text-sm mt-2">Hãy thử từ khóa khác hoặc xóa bộ lọc.</p>
+                </div>
+              ) : (
+                <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4'>
+                  {products.map((product) => (
+                    <Link
+                      to={`/product?id=${product.id}`}
+                      key={product.id}
+                      className='bg-white border rounded overflow-hidden shadow hover:shadow-lg transition'
+                    >
+                      <div className='relative'>
+                        <img
+                          src={product.images?.[0] || '/placeholder.png'}
+                          alt={product.name}
+                          className='w-full h-40 object-cover'
+                        />
+                        {/* Badges */}
+                        <div className='absolute left-2 top-2 flex flex-col gap-1'>
+                          <span className='bg-orange-500 text-white text-xs px-2 py-0.5 rounded'>
+                            Yêu thích
+                          </span>
+                          <span className='bg-yellow-400 text-xs px-2 py-0.5 rounded'>
+                            Online Shop Siêu Rẻ
+                          </span>
+                        </div>
                       </div>
 
-                      <div className='flex items-center justify-between'>
-                        <div>
-                          <div className='text-lg font-bold text-red-600'>
-                            {formatPrice(product.price)}
-                          </div>
-                          {/* Optional original price - render only if exists on product */}
-                          {'originalPrice' in product &&
-                          (product as any).originalPrice ? (
-                            <div className='text-xs text-gray-400 line-through'>
-                              {formatPrice((product as any).originalPrice)}
+                      <div className='p-3'>
+                        <h2 className='text-sm font-semibold truncate mb-1'>
+                          {product.name}
+                        </h2>
+                        <div className='text-xs text-gray-500 mb-2 truncate'>
+                          {product.category?.name}
+                        </div>
+
+                        <div className='flex items-center justify-between'>
+                          <div>
+                            <div className='text-lg font-bold text-red-600'>
+                              {formatPrice(product.price)}
                             </div>
-                          ) : null}
-                        </div>
+                            {/* Optional original price - render only if exists on product */}
+                            {'originalPrice' in product &&
+                            (product as any).originalPrice ? (
+                              <div className='text-xs text-gray-400 line-through'>
+                                {formatPrice((product as any).originalPrice)}
+                              </div>
+                            ) : null}
+                          </div>
 
-                        <div className='text-right text-xs text-gray-500'>
-                          <div>⭐ {(product as any).rating ?? 5}</div>
-                          <div className='mt-1'>
-                            {(product as any).location ?? 'TP. Hồ Chí Minh'}
+                          <div className='text-right text-xs text-gray-500'>
+                            <div>⭐ {(product as any).rating ?? 5}</div>
+                            <div className='mt-1'>
+                              {(product as any).location ?? 'TP. Hồ Chí Minh'}
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  </Link>
-                ))}
-              </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
 
-              {/* Pagination (simple) */}
-              <div className='flex items-center justify-end mt-6 space-x-3'>
-                <button className='px-3 py-1 border rounded'>‹</button>
-                <button className='px-3 py-1 border rounded bg-white'>1</button>
-                <button className='px-3 py-1 border rounded'>2</button>
-                <button className='px-3 py-1 border rounded'>›</button>
-              </div>
+              {/* Pagination */}
+              {totalPages > 1 && (
+                <div className='flex items-center justify-end mt-6 space-x-2'>
+                  <button 
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className='px-3 py-1 border rounded disabled:opacity-50 hover:bg-gray-50'
+                  >
+                    ‹
+                  </button>
+                  
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                     <button
+                        key={page}
+                        onClick={() => handlePageChange(page)}
+                        className={`px-3 py-1 border rounded ${
+                          currentPage === page 
+                            ? 'bg-orange-500 text-white border-orange-500' 
+                            : 'bg-white hover:bg-gray-50'
+                        }`}
+                      >
+                        {page}
+                      </button>
+                  ))}
+
+                  <button 
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className='px-3 py-1 border rounded disabled:opacity-50 hover:bg-gray-50'
+                  >
+                    ›
+                  </button>
+                </div>
+              )}
             </>
           )}
         </main>

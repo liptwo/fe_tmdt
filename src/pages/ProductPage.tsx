@@ -21,6 +21,7 @@ import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Avatar } from '@/components/ui/avatar'
+import { toast } from 'sonner'
 interface Review {
   id: number
   user: string
@@ -60,6 +61,8 @@ const defaultProduct = {
 - Làm dịu da nhạy cảm
 - Thẩm thấu nhanh, không gây bết dính
 - Dùng được cho mọi loại da`,
+  sellerName: 'Shop Giữ Nhiệt Cao Cấp',
+  categoryName: 'Chăm sóc sắc đẹp',
   reviews: [
     {
       id: 1,
@@ -226,204 +229,14 @@ const computeReviewSummary = (reviews: DetailedReview[]) => {
   return { ratingsCount, totalComments, totalMedia, averageRating }
 }
 
-const ReviewItem = ({ review }: { review: DetailedReview }) => {
-  const renderStars = (rating: number) => (
-    <div className='flex text-orange-500 text-lg'>
-      {'★'.repeat(rating)}
-      {'☆'.repeat(5 - rating)}
-    </div>
-  )
 
-  return (
-    <div className='p-4 bg-white rounded-lg shadow-sm flex flex-col space-y-2 border border-black-200'>
-      <div className='flex items-start space-x-3'>
-        <img
-          src={placeholderImage(40, review.user.slice(0, 2))}
-          alt={review.user}
-          className='w-10 h-10 rounded-full object-cover border border-orange-300'
-        />
-        <div>
-          <p className='font-semibold text-sm text-black'>{review.user}</p>
-          {renderStars(review.rating)}
-        </div>
-      </div>
-      <p className='text-xs text-gray-500 pl-12'>{review.date}</p>
-      <div className='text-sm space-y-1 mt-2 text-black'>
-        <p>
-          <strong>Công dụng:</strong> <span>{review.usage}</span>
-        </p>
-        <p>
-          <strong>Hiệu quả dưỡng ẩm:</strong>{' '}
-          <span className='text-orange-500 font-semibold'>
-            {review.moisturizingEffect}
-          </span>
-        </p>
-        <p>
-          <strong>Khả năng thẩm thấu:</strong> <span>{review.absorption}</span>
-        </p>
-      </div>
-      <p className='mt-2 text-black'>{review.comment}</p>
-      {review.hasMedia && (
-        <div className='flex space-x-2 mt-2'>
-          <div className='relative w-24 h-24 border border-orange-300 rounded overflow-hidden'>
-            <img
-              src={placeholderImage(100, 'Video')}
-              alt='review video'
-              className='w-full h-full object-cover'
-            />
-            <div className='absolute bottom-1 left-1 bg-black bg-opacity-50 text-white text-xs px-1 rounded flex items-center'>
-              ▶ 0:13
-            </div>
-          </div>
-          <div className='relative w-24 h-24 border border-orange-300 rounded overflow-hidden'>
-            <img
-              src={placeholderImage(100, 'Image')}
-              alt='review media 2'
-              className='w-full h-full object-cover'
-            />
-          </div>
-        </div>
-      )}
-      <div className='mt-2 flex items-center text-sm text-gray-600'>
-        ❤️ {review.likes}
-      </div>
-    </div>
-  )
-}
 
-const ReviewSummary = ({ reviews }: { reviews: DetailedReview[] }) => {
-  const [selectedTab, setSelectedTab] = useState<
-    'all' | number | 'comments' | 'media'
-  >('all')
 
-  // LOGIC ĐÃ THÊM CHO PHẦN ĐÁNH GIÁ
-  const [showAllReviews, setShowAllReviews] = useState(false)
-  const maxReviewsToShow = 5
-
-  const filteredReviews = reviews.filter((review) => {
-    if (selectedTab === 'all') return true
-    if (selectedTab === 'comments') return review.comment.length > 0
-    if (selectedTab === 'media') return review.hasMedia
-    if (typeof selectedTab === 'number') return review.rating === selectedTab
-    return true
-  })
-
-  const reviewSummary = useMemo(() => computeReviewSummary(reviews), [reviews])
-
-  // Áp dụng giới hạn 5 review đầu tiên
-  const reviewsToDisplay = showAllReviews
-    ? filteredReviews
-    : filteredReviews.slice(0, maxReviewsToShow)
-
-  const shouldShowReviewToggleButton = filteredReviews.length > maxReviewsToShow
-
-  const handleToggleShowReviews = () => {
-    setShowAllReviews(!showAllReviews)
-  }
-  // KẾT THÚC LOGIC ĐÃ THÊM
-
-  const formatCount = (count: number) =>
-    count >= 1000
-      ? `${(count / 1000).toFixed(1).replace('.0', '')}k`
-      : count.toString()
-
-  const tabClass = (isActive: boolean) =>
-    `px-4 py-2 border rounded-full text-sm transition-all duration-300 cursor-pointer whitespace-nowrap ${
-      isActive
-        ? 'bg-orange-500 text-white border-orange-500 font-semibold scale-105 shadow-md'
-        : 'bg-white text-black border-orange-300 hover:bg-orange-50'
-    }`
-
-  return (
-    <div className='bg-white rounded-2xl shadow-lg p-6 border-t-4 border-green-500'>
-      <h2 className='text-xl font-bold mb-4 text-black'>ĐÁNH GIÁ SẢN PHẨM</h2>
-
-      <div className='flex flex-col sm:flex-row items-start sm:items-center space-y-4 sm:space-y-0 sm:space-x-8 border-b border-black-200 pb-4 mb-4'>
-        <div className='flex flex-col items-start min-w-[150px]'>
-          <span className='text-5xl font-bold text-orange-500'>
-            {reviewSummary.averageRating.toFixed(1)}{' '}
-            <span className='text-2xl text-black'>/5</span>
-          </span>
-          <div className='text-orange-500 text-3xl'>{'★'.repeat(5)}</div>
-        </div>
-
-        <div className='flex flex-wrap gap-2'>
-          <button
-            className={tabClass(selectedTab === 'all')}
-            onClick={() => {
-              setSelectedTab('all')
-              setShowAllReviews(false) // Reset trạng thái xem thêm khi đổi tab
-            }}
-          >
-            Tất Cả
-          </button>
-          {Object.entries(reviewSummary.ratingsCount as Record<string, number>)
-            .reverse()
-            .map(([star, count]) => (
-              <button
-                key={star}
-                className={tabClass(selectedTab === Number(star))}
-                onClick={() => {
-                  setSelectedTab(Number(star))
-                  setShowAllReviews(false) // Reset trạng thái xem thêm khi đổi tab
-                }}
-              >
-                {star} Sao ({formatCount(Number(count))})
-              </button>
-            ))}
-        </div>
-      </div>
-
-      <div className='flex flex-wrap gap-2 mb-4'>
-        <button
-          className={tabClass(selectedTab === 'comments')}
-          onClick={() => {
-            setSelectedTab('comments')
-            setShowAllReviews(false) // Reset trạng thái xem thêm khi đổi tab
-          }}
-        >
-          Có Bình Luận ({formatCount(reviewSummary.totalComments)})
-        </button>
-        <button
-          className={tabClass(selectedTab === 'media')}
-          onClick={() => {
-            setSelectedTab('media')
-            setShowAllReviews(false) // Reset trạng thái xem thêm khi đổi tab
-          }}
-        >
-          Có Hình Ảnh / Video ({formatCount(reviewSummary.totalMedia)})
-        </button>
-      </div>
-
-      <div className='space-y-4'>
-        {/* SỬ DỤNG reviewsToDisplay ĐÃ ĐƯỢC GIỚI HẠN */}
-        {reviewsToDisplay.map((review) => (
-          <ReviewItem key={review.id} review={review} />
-        ))}
-      </div>
-
-      {/* NÚT XEM THÊM / ẨN BỚT ĐÁNH GIÁ */}
-      {shouldShowReviewToggleButton && (
-        <div className='text-center mt-6'>
-          <button
-            onClick={handleToggleShowReviews}
-            className='bg-gray-100 text-gray-700 py-2 px-6 rounded-full font-medium shadow-md hover:bg-gray-200 transition-colors duration-300 border border-gray-300'
-          >
-            {showAllReviews
-              ? 'Ẩn bớt ▲'
-              : `Xem thêm ${
-                  filteredReviews.length - maxReviewsToShow
-                } đánh giá khác ▼`}
-          </button>
-        </div>
-      )}
-    </div>
-  )
-}
 
 // ---------------------- MAIN ------------------------
 const ProductPage = () => {
   const [searchParams] = useSearchParams()
+  // const navigate = useNavigate() // navigate is used in handleAddToCart
   const navigate = useNavigate()
   const { token } = useAuth()
   const { refreshCart } = useCart()
@@ -435,7 +248,17 @@ const ProductPage = () => {
       productId
     )
   const [productOverride, setProductOverride] = useState<
-    Partial<typeof defaultProduct> & { images?: string[] }
+    Partial<typeof defaultProduct> & { 
+      images?: string[]; 
+      sellerName?: string;
+      stock?: number;
+      sold?: number;
+      location?: string;
+      discount?: number;
+      rating?: number;
+      originalPrice?: string;
+      categoryName?: string;
+    }
   >({})
   const [isLoadingProduct, setIsLoadingProduct] = useState(false)
   const [productError, setProductError] = useState<string | null>(null)
@@ -476,7 +299,15 @@ const ProductPage = () => {
           name: data.name,
           price: formatCurrency(Number(data.price)),
           images: data.images?.length ? data.images : defaultProduct.images,
-          description: data.description ?? defaultProduct.description
+          description: data.description ?? defaultProduct.description,
+          sellerName: data.seller?.fullName || data.seller?.email || 'Shop',
+          stock: data.stock,
+          sold: data.sold,
+          location: data.location,
+          discount: data.discount,
+          rating: data.rating,
+          originalPrice: data.originalPrice ? formatCurrency(Number(data.originalPrice)) : undefined,
+          categoryName: data.category?.name
         })
       } catch (err) {
         if (!isMounted) return
@@ -654,10 +485,10 @@ const ProductPage = () => {
       // Refresh cart
       await refreshCart()
 
-      console.log('[cart] Buy now - redirecting to checkout')
+      console.log('[cart] Buy now - redirecting to cart')
 
-      // Navigate to checkout immediately
-      navigate('/checkout')
+      // Navigate to cart to review before checkout
+      navigate('/cart')
     } catch (error) {
       console.error('[cart] buy now failed', error)
       setCartStatus('error')
@@ -684,8 +515,12 @@ const ProductPage = () => {
           <div className='flex items-center gap-2 text-sm text-gray-500'>
             <span>Trang chủ</span>
             <ChevronRight className='h-4 w-4' />
-            <span>Sản phẩm</span>
-            <ChevronRight className='h-4 w-4' />
+            {product.categoryName && (
+              <>
+                <span>{product.categoryName}</span>
+                <ChevronRight className='h-4 w-4' />
+              </>
+            )}
             <span className='text-gray-800'>{product.name}</span>
           </div>
         </div>
@@ -713,9 +548,11 @@ const ProductPage = () => {
                   alt={product.name}
                   className='object-cover w-full h-full'
                 />
-                <Badge className='absolute top-4 left-4 bg-red-500 text-white'>
-                  -12%
-                </Badge>
+                {!!product.discount && product.discount > 0 && (
+                  <Badge className='absolute top-4 left-4 bg-red-500 text-white'>
+                    -{product.discount}%
+                  </Badge>
+                )}
               </div>
               <div className='grid grid-cols-5 gap-2'>
                 {product.images.map((img, idx) => (
@@ -762,10 +599,10 @@ const ProductPage = () => {
             <Card className='p-4 mt-4'>
               <div className='flex items-center gap-3'>
                 <div className='w-12 h-12 rounded-full bg-orange-500 flex items-center justify-center text-white font-bold'>
-                  S
+                  {product.sellerName ? product.sellerName.charAt(0).toUpperCase() : 'S'}
                 </div>
                 <div className='flex-1'>
-                  <h3 className='font-semibold'>Shop Giữ Nhiệt Cao Cấp</h3>
+                  <h3 className='font-semibold'>{product.sellerName || 'Shop Giữ Nhiệt Cao Cấp'}</h3>
                   <p className='text-sm text-gray-500'>Online 2 giờ trước</p>
                 </div>
                 <div className='flex gap-2'>
@@ -776,7 +613,7 @@ const ProductPage = () => {
                   <Button
                     variant='outline'
                     size='sm'
-                    onClick={() => alert('Xem shop')}
+                    onClick={() => toast.info('Tính năng đang phát triển')}
                   >
                     Xem Shop
                   </Button>
@@ -799,38 +636,33 @@ const ProductPage = () => {
               <div className='flex items-center gap-6 mb-4'>
                 <div className='flex items-center gap-2'>
                   <span className='text-orange-500 font-bold underline'>
-                    4.9
+                    {product.rating}
                   </span>
                   <div className='flex'>
                     {[...Array(5)].map((_, i) => (
                       <Star
                         key={i}
-                        className='h-4 w-4 fill-orange-400 text-orange-400'
+                        className={`h-4 w-4 ${i < Math.floor(product.rating || 0) ? 'fill-orange-400 text-orange-400' : 'text-gray-300'}`}
                       />
                     ))}
                   </div>
                 </div>
-                <Separator orientation='vertical' className='h-4' />
-                <div>
-                  <span className='font-bold underline'>2.5k</span> Đánh Giá
-                </div>
-                <Separator orientation='vertical' className='h-4' />
-                <div>
-                  <span className='font-bold'>12.8k</span> Đã Bán
-                </div>
-              </div>
 
               <div className='bg-gray-50 p-4 rounded-lg mb-6'>
                 <div className='flex items-baseline gap-4'>
                   <span className='text-3xl font-bold text-orange-500'>
                     {product.price}
                   </span>
-                  <span className='text-lg line-through text-gray-400'>
-                    ₫100.000
-                  </span>
-                  <Badge variant='destructive' className='bg-orange-500'>
-                    -12% GIẢM
-                  </Badge>
+                  {product.originalPrice && (
+                    <span className='text-lg line-through text-gray-400'>
+                      {product.originalPrice}
+                    </span>
+                  )}
+                  {!!product.discount && product.discount > 0 && (
+                    <Badge variant='destructive' className='bg-orange-500'>
+                      -{product.discount}% GIẢM
+                    </Badge>
+                  )}
                 </div>
               </div>
 
@@ -877,7 +709,7 @@ const ProductPage = () => {
                   </Button>
                 </div>
                 <span className='text-sm text-gray-500'>
-                  1.234 sản phẩm có sẵn
+                  {product.stock} sản phẩm có sẵn
                 </span>
               </div>
 
@@ -946,6 +778,7 @@ const ProductPage = () => {
                   </span>
                   <span>Việt Nam</span>
                 </div>
+                {/* Hidden unsupported fields
                 <div className='flex'>
                   <span className='text-muted-foreground w-[180px]'>
                     Dung tích
@@ -958,11 +791,12 @@ const ProductPage = () => {
                   </span>
                   <span>Inox 304</span>
                 </div>
+                */}
                 <div className='flex'>
                   <span className='text-muted-foreground w-[180px]'>
                     Gửi từ
                   </span>
-                  <span>Hà Nội</span>
+                  <span>{product.location}</span>
                 </div>
               </div>
 
@@ -982,7 +816,7 @@ const ProductPage = () => {
           <div className='flex items-center gap-8 mb-6 p-6 bg-orange-50 rounded-lg'>
             <div className='text-center'>
               <div className='text-3xl font-bold text-orange-500 mb-2'>
-                {ReviewSummary?.averageRating?.toFixed(1)}/5
+                {computeReviewSummary(product.reviews).averageRating.toFixed(1)}/5
               </div>
               <div className='flex justify-center mb-2'>
                 {[...Array(5)].map((_, i) => (

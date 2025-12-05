@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+import { toast } from "sonner";
 
 const Address = () => {
     const [showCard, setShowCard] = useState(false);
-    const [provinces, setProvinces] = useState([]);
-    const [districts, setDistricts] = useState([]);
-    const [wards, setWards] = useState([]);
-    const [addresses, setAddresses] = useState([]);
-    const [editIndex, setEditIndex] = useState(null);
+    const [provinces, setProvinces] = useState<any[]>([]);
+    const [districts, setDistricts] = useState<any[]>([]);
+    const [wards, setWards] = useState<any[]>([]);
+    const [addresses, setAddresses] = useState<any[]>([]);
+    const [editIndex, setEditIndex] = useState<number | null>(null);
 
     const [selected, setSelected] = useState({
         province: "",
@@ -55,14 +56,14 @@ const Address = () => {
     }, [selected.district]);
 
     // ✅ Xử lý thay đổi input
-    const handleChange = (e) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
 
     // ✅ Lưu địa chỉ mới hoặc cập nhật
     const handleSave = () => {
         if (!form.name || !form.phone || !form.street || !selected.province || !selected.district || !selected.ward) {
-            alert("Vui lòng nhập đầy đủ thông tin!");
+            toast.error("Vui lòng nhập đầy đủ thông tin!");
             return;
         }
 
@@ -95,14 +96,14 @@ const Address = () => {
     };
 
     // 🗑️ Xóa địa chỉ
-    const handleDelete = (index) => {
+    const handleDelete = (index: number) => {
         if (window.confirm("Bạn có chắc muốn xóa địa chỉ này?")) {
             setAddresses(addresses.filter((_, i) => i !== index));
         }
     };
 
     // ✏️ Cập nhật địa chỉ
-    const handleEdit = (index) => {
+    const handleEdit = (index: number) => {
         const addr = addresses[index];
         setForm({
             name: addr.name,
@@ -119,7 +120,7 @@ const Address = () => {
     };
 
     // 🌟 Thiết lập mặc định
-    const handleSetDefault = (index) => {
+    const handleSetDefault = (index: number) => {
         const updated = addresses.map((a, i) => ({
             ...a,
             isDefault: i === index,

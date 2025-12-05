@@ -6,26 +6,6 @@ import { productsApi } from "@/lib/api"
 
 const prefixImage = "/src/assets/image/top-product/"
 
-const FALLBACK_TOP_PRODUCTS: TopProducts[] = [
-    { id: 1, title: "Sạc Laptop HP", image: `${prefixImage}sac-laptop-hp.png`, sales: "Bán 1k+ / tháng", href: "/search/sac-laptop-hp" },
-    { id: 2, title: "Bàn Phím Giả Cơ", image: `${prefixImage}ban-phim-gia-co.png`, sales: "Bán 17k+ / tháng", href: "/search/ban-phim-gia-co" },
-    { id: 3, title: "Tai Nghe Gaming", image: `${prefixImage}tai-nghe-gaming.png`, sales: "Bán 7k+ / tháng", href: "/search/tai-nghe-gaming" },
-    { id: 4, title: "Sạc Dự Phòng", image: `${prefixImage}sac-du-phong.png`, sales: "Bán 20k+ / tháng", href: "/search/sac-du-phong" },
-    { id: 5, title: "Thảm Trải Sàn", image: `${prefixImage}tham-trai-san.png`, sales: "Bán 9k+ / tháng", href: "/search/tham-trai-san" },
-    { id: 6, title: "Bộ Vệ Sinh Laptop", image: `${prefixImage}bo-ve-sinh-laptop.png`, sales: "Bán 2k+ / tháng", href: "/search/bo-ve-sinh-laptop" },
-    { id: 7, title: "Khăn Trải Bàn Caro", image: `${prefixImage}khan-trai-ban-caro.png`, sales: "Bán 3k+ / tháng", href: "/search/khan-trai-ban-caro" },
-    { id: 8, title: "Áo Thun", image: `${prefixImage}ao-thun.png`, sales: "Bán 50k+ / tháng", href: "/search/ao-thun" },
-    { id: 9, title: "Bánh Trứng Tipo", image: `${prefixImage}banh-trung-tipo.png`, sales: "Bán 15k+ / tháng", href: "/search/banh-trung-tipo" },
-    { id: 10, title: "Dép Đi Trong Nhà", image: `${prefixImage}dep-di-trong-nha.png`, sales: "Bán 12k+ / tháng", href: "/search/dep-di-trong-nha" },
-    { id: 11, title: "Cây Lăn Bụi Quần Áo", image: `${prefixImage}cay-lan-bui-quan-ao.png`, sales: "Bán 6k+ / tháng", href: "/search/cay-lan-bui-quan-ao" },
-    { id: 12, title: "Dụng Cụ Lấy Ráy Tai", image: `${prefixImage}dung-cu-lay-ray-tai.png`, sales: "Bán 4k+ / tháng", href: "/search/dung-cu-lay-ray-tai" },
-    { id: 13, title: "Bộ Chăn Ga Gối Cotton", image: `${prefixImage}bo-chan-ga-goi-cotton.png`, sales: "Bán 9k+ / tháng", href: "/search/bo-chan-ga-goi-cotton" },
-    { id: 14, title: "Dầu Gội Nguyên Xuân", image: `${prefixImage}dau-goi-nguyen-xuan.png`, sales: "Bán 8k+ / tháng", href: "/search/dau-goi-nguyen-xuan" },
-    { id: 15, title: "Tinh Dầu Bưởi Cocoon", image: `${prefixImage}tinh-dau-buoi-cocoon.png`, sales: "Bán 7k+ / tháng", href: "/search/tinh-dau-buoi-cocoon" },
-    { id: 16, title: "Kem Dưỡng Cerave", image: `${prefixImage}kem-duong-cerave.png`, sales: "Bán 11k+ / tháng", href: "/search/kem-duong-cerave" },
-    { id: 17, title: "Cây Lau Kính", image: `${prefixImage}cay-lau-kinh.png`, sales: "Bán 3k+ / tháng", href: "/search/cay-lau-kinh" },
-]
-
 const formatCurrency = (value: number) =>
     new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(Number(value))
 
@@ -57,7 +37,9 @@ const TopProduct = () => {
         }
     }, [])
 
-    const products = useMemo(() => (remoteProducts.length > 0 ? remoteProducts : FALLBACK_TOP_PRODUCTS), [remoteProducts])
+    const products = useMemo(() => remoteProducts, [remoteProducts])
+
+    if (products.length === 0) return null
 
     return (
         <div className="w-full bg-white mt-5">

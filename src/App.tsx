@@ -13,7 +13,11 @@ import SellAndChatApp from './pages/user/Sell'
 import FloatingChatBox from './components/ui/FloatingChatBox'
 import NotFound from './pages/not-found'
 import SearchPage from './pages/Search'
-import Ninga from './assets/image.png'
+
+import AdminLayout from './pages/admin/AdminLayout'
+import Dashboard from './pages/admin/Dashboard'
+import ProductManagement from './pages/admin/ProductManagement'
+import UserManagement from './pages/admin/UserManagement'
 function App() {
   return (
     <div className='relative'>
@@ -35,6 +39,13 @@ function App() {
         <Route path='/checkout' element={<Checkout />} />
         <Route path='/login' element={<Login />} />
         <Route path='/register' element={<Login />} />
+        
+        {/* Admin Routes */}
+        <Route path='/admin' element={<AdminLayout />}>
+          <Route index element={<Dashboard />} />
+          <Route path='users' element={<UserManagement />} />
+          <Route path='products' element={<ProductManagement />} />
+        </Route>
       </Routes>
 
       <FloatingChatBox />

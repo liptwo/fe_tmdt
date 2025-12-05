@@ -21,7 +21,7 @@ export interface FeatBanner {
 }
 
 export interface TopProducts {
-    id: number;
+    id: number | string;
     title: string;
     image: string;
     sales: string;

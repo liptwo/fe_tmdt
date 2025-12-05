@@ -68,21 +68,29 @@ export function Login() {
     setSuccess('')
     setIsRegistering(true)
     try {
+      // Đăng ký tài khoản
       await authApi.register({
         email: email.trim(),
         password,
         fullName: fullName.trim()
       })
-      setSuccess('Đăng ký thành công! Vui lòng đăng nhập.')
-      setPhone('')
-      setEmail('')
-      setPassword('')
-      setFullName('')
+      
+      setSuccess('Đăng ký thành công! Đang đăng nhập...')
+      
+      // Tự động đăng nhập sau khi register thành công
+      const loginResponse = await authApi.login({
+        email: email.trim(),
+        password
+      })
+      
+      // Lưu session và redirect về home
+      setSession(loginResponse.access_token, loginResponse.user)
+      navigate('/', { replace: true })
     } catch (err) {
       if (err instanceof ApiError) {
         setError(err.message)
       } else {
-        setError('Không thể đăng ký. Vui lòng thử lại sau.')
+        setError('Đã có lỗi xảy ra. Vui lòng thử lại sau.')
       }
     } finally {
       setIsRegistering(false)
@@ -108,7 +116,16 @@ export function Login() {
         password
       })
       setSession(response.access_token, response.user)
-      navigate('/', { replace: true })
+      
+      // Auto-redirect dựa trên role
+      const userRole = response.user.role
+      if (userRole === 'admin') {
+        navigate('/admin', { replace: true })
+      } else if (userRole === 'seller') {
+        navigate('/channel', { replace: true })
+      } else {
+        navigate('/', { replace: true })
+      }
     } catch (err) {
       if (err instanceof ApiError) {
         setError(err.message)
@@ -126,9 +143,11 @@ export function Login() {
         <div className='h-[5rem] w-full flex justify-between mx-auto  bg-background shadow-md items-center px-4'>
           <div className='container w-full flex justify-between mx-auto'>
             <div className='flex items-center justify-center'>
-              <h1 className='text-3xl font-bold text-red-500 ml-4'>
-                ShopOnline
-              </h1>
+              <Link to='/'>
+                <h1 className='text-3xl font-bold text-red-500 ml-4'>
+                  ShopOnline
+                </h1>
+              </Link>
             </div>
             <Button
               variant='link'

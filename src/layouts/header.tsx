@@ -93,6 +93,14 @@ const Header = ({ navbarBelow = true }) => {
                 {item.name}
               </Link>
             ))}
+            {(user?.role === 'seller' || user?.role === 'admin') && (
+              <Link
+                className='border-r border-white/30 pr-3 text-white hover:text-orange-100 transition-colors font-light'
+                to='/channel'
+              >
+                Kênh Người Bán
+              </Link>
+            )}
             <div className='flex items-center gap-2'>
               <span className='font-light text-white'>Kết nối</span>
               <Link
@@ -253,7 +261,7 @@ const Header = ({ navbarBelow = true }) => {
                       Tài khoản của tôi
                     </Link>
                     <Link
-                      to='/user/purchase'
+                      to='/user/orders'
                       className='block px-4 py-2 hover:bg-gray-100 rounded font-medium'
                     >
                       Đơn Mua
@@ -317,19 +325,49 @@ const Header = ({ navbarBelow = true }) => {
                   onMouseLeave={() => setCartOpen(false)}
                 >
                   <div className='absolute -top-2 right-4 w-4 h-4 bg-white transform rotate-45 border-l border-t border-gray-200'></div>
-                  <div className='p-4'>
-                    <div className='text-center py-8'>
-                      <ShoppingCart
-                        size={48}
-                        className='mx-auto text-gray-300 mb-4'
-                      />
-                      <p className='text-gray-500 font-medium'>
-                        Chưa có sản phẩm nào
-                      </p>
-                      <p className='text-sm text-gray-400 mt-1'>
-                        Hãy thêm sản phẩm vào giỏ hàng
-                      </p>
-                    </div>
+                  <div className='p-2'>
+                    {cart && cart.items && cart.items.length > 0 ? (
+                      <>
+                        <div className='text-gray-400 text-sm mb-2 p-2'>Sản phẩm mới thêm</div>
+                        <div className='max-h-60 overflow-y-auto'>
+                          {cart.items.slice(0, 5).map((item) => (
+                            <div key={item.id} className='flex gap-2 p-2 hover:bg-gray-50 items-start'>
+                                <img
+                                  src={item.product?.images?.[0] || '/placeholder.svg'}
+                                  alt={item.product?.name}
+                                  className='w-10 h-10 object-cover border border-gray-200'
+                                />
+                                <div className='flex-1 min-w-0'>
+                                    <p className='text-sm font-medium text-gray-900 truncate'>{item.product?.name}</p>
+                                    <div className='flex justify-between items-center mt-1'>
+                                        <span className='text-xs text-gray-500'>x{item.quantity}</span>
+                                        <span className='text-sm text-orange-500'>₫{Number(item.unitPrice).toLocaleString()}</span>
+                                    </div>
+                                </div>
+                            </div>
+                          ))}
+                        </div>
+                        <div className='flex justify-between items-center p-2 mt-2 border-t border-gray-100'>
+                            <span className='text-xs text-gray-500'>{cart.items.length > 5 ? `${cart.items.length - 5} sản phẩm khác trong giỏ` : ''}</span>
+                            <Link to='/cart' className='bg-orange-500 text-white text-sm px-4 py-2 rounded hover:bg-orange-600 transition-colors'>
+                                Xem Giỏ Hàng
+                            </Link>
+                        </div>
+                      </>
+                    ) : (
+                      <div className='text-center py-8'>
+                        <ShoppingCart
+                          size={48}
+                          className='mx-auto text-gray-300 mb-4'
+                        />
+                        <p className='text-gray-500 font-medium'>
+                          Chưa có sản phẩm nào
+                        </p>
+                        <p className='text-sm text-gray-400 mt-1'>
+                          Hãy thêm sản phẩm vào giỏ hàng
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
@@ -361,7 +399,7 @@ const Header = ({ navbarBelow = true }) => {
                       Tài khoản của tôi
                     </Link>
                     <Link
-                      to='/user/purchase'
+                      to='/user/orders'
                       className='block px-4 py-2 hover:bg-gray-100 rounded font-medium'
                     >
                       Đơn Mua
@@ -398,19 +436,49 @@ const Header = ({ navbarBelow = true }) => {
                   {/* Triangle arrow pointing up */}
                   <div className='absolute -top-2 right-4 w-4 h-4 bg-white transform rotate-45 border-l border-t border-gray-200'></div>
 
-                  <div className='p-4'>
-                    <div className='text-center py-8'>
-                      <ShoppingCart
-                        size={48}
-                        className='mx-auto text-gray-300 mb-4'
-                      />
-                      <p className='text-gray-500 font-medium'>
-                        Chưa có sản phẩm nào
-                      </p>
-                      <p className='text-sm text-gray-400 mt-1'>
-                        Hãy thêm sản phẩm vào giỏ hàng
-                      </p>
-                    </div>
+                  <div className='p-2'>
+                    {cart && cart.items && cart.items.length > 0 ? (
+                      <>
+                        <div className='text-gray-400 text-sm mb-2 p-2'>Sản phẩm mới thêm</div>
+                        <div className='max-h-60 overflow-y-auto'>
+                          {cart.items.slice(0, 5).map((item) => (
+                            <div key={item.id} className='flex gap-2 p-2 hover:bg-gray-50 items-start'>
+                                <img
+                                  src={item.product?.images?.[0] || '/placeholder.svg'}
+                                  alt={item.product?.name}
+                                  className='w-10 h-10 object-cover border border-gray-200'
+                                />
+                                <div className='flex-1 min-w-0'>
+                                    <p className='text-sm font-medium text-gray-900 truncate'>{item.product?.name}</p>
+                                    <div className='flex justify-between items-center mt-1'>
+                                        <span className='text-xs text-gray-500'>x{item.quantity}</span>
+                                        <span className='text-sm text-orange-500'>₫{Number(item.unitPrice).toLocaleString()}</span>
+                                    </div>
+                                </div>
+                            </div>
+                          ))}
+                        </div>
+                        <div className='flex justify-between items-center p-2 mt-2 border-t border-gray-100'>
+                            <span className='text-xs text-gray-500'>{cart.items.length > 5 ? `${cart.items.length - 5} sản phẩm khác trong giỏ` : ''}</span>
+                            <Link to='/cart' className='bg-orange-500 text-white text-sm px-4 py-2 rounded hover:bg-orange-600 transition-colors'>
+                                Xem Giỏ Hàng
+                            </Link>
+                        </div>
+                      </>
+                    ) : (
+                      <div className='text-center py-8'>
+                        <ShoppingCart
+                          size={48}
+                          className='mx-auto text-gray-300 mb-4'
+                        />
+                        <p className='text-gray-500 font-medium'>
+                          Chưa có sản phẩm nào
+                        </p>
+                        <p className='text-sm text-gray-400 mt-1'>
+                          Hãy thêm sản phẩm vào giỏ hàng
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
